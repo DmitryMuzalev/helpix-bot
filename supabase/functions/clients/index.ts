@@ -1,7 +1,7 @@
 import '@supabase/functions-js/edge-runtime.d.ts';
 import { withSupabase } from '@supabase/server';
 import { listAllPages } from '../_shared/application/list-all-pages.ts';
-import { createMessageReader } from '../_shared/adapters/message-reader.ts';
+import { createClientReader } from '../_shared/adapters/client-reader.ts';
 
 export default {
   fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
@@ -13,11 +13,11 @@ export default {
     }
 
     try {
-      const messages = await listAllPages(createMessageReader(ctx.supabaseAdmin));
-      return Response.json(messages);
+      const clients = await listAllPages(createClientReader(ctx.supabaseAdmin));
+      return Response.json(clients);
     } catch (error) {
-      console.error('Failed to list messages:', error);
-      return Response.json({ error: 'Unable to load messages' }, { status: 500 });
+      console.error('Failed to list clients:', error);
+      return Response.json({ error: 'Unable to load clients' }, { status: 500 });
     }
   }),
 };

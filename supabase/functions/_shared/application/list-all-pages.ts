@@ -1,13 +1,13 @@
-export async function listMessages<T>(
+export async function listAllPages<T>(
   loadPage: (from: number, to: number) => Promise<T[]>,
 ): Promise<T[]> {
   const pageSize = 500;
-  const messages: T[] = [];
+  const items: T[] = [];
 
   for (let from = 0; ; from += pageSize) {
     const page = await loadPage(from, from + pageSize - 1);
-    messages.push(...page);
+    items.push(...page);
 
-    if (page.length < pageSize) return messages;
+    if (page.length < pageSize) return items;
   }
 }
