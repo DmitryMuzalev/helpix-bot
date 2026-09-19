@@ -20,7 +20,7 @@
 
 ## Verification
 
-- After changing TypeScript, JavaScript, or JSON files, run `npm.cmd run lint` and `npm.cmd run format:check`.
+- After changing TypeScript, JavaScript, or JSON files, run `npm run lint` and `npm run format:check`.
 - After changing an Edge Function, also run the project's TypeScript check once that command has been configured.
 - Report any check that could not be run and why.
 
