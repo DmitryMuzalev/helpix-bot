@@ -1,32 +1,47 @@
-// Follow this setup guide to integrate the Deno language server with your editor:
-// https://deno.land/manual/getting_started/setup_your_environment
-// This enables autocomplete, go to definition, etc.
+import '@supabase/functions-js/edge-runtime.d.ts';
+import { withSupabase } from '@supabase/server';
+import { parseIncomingTelegramMessage } from '../_shared/adapters/telegram-update.ts';
+import { handleTelegramMessage } from '../_shared/application/handle-telegram-message.ts';
+import { createTelegramDependencies } from '../_shared/infrastructure/telegram-dependencies.ts';
 
-// Setup type definitions for built-in Supabase Runtime APIs
-import "@supabase/functions-js/edge-runtime.d.ts";
-import { withSupabase } from "@supabase/server";
-
-console.log("Hello from Functions!");
-
-// This endpoint uses auth 'none', no credentials required, every request is accepted.
-// Use it for health checks, public APIs, or when you need to implement your own auth logic.
 export default {
-  fetch: withSupabase({ auth: "none" }, async (req) => {
-    const { name } = await req.json();
+  fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
+    if (req.method !== 'POST') {
+      return new Response('Method Not Allowed', {
+        status: 405,
+        headers: { Allow: 'POST' },
+      });
+    }
 
-    return Response.json({
-      message: `Hello ${name}!`,
-    });
+    const webhookSecret = Deno.env.get('TELEGRAM_WEBHOOK_SECRET');
+    const botToken = Deno.env.get('TELEGRAM_BOT_TOKEN');
+    if (!webhookSecret || !botToken) {
+      console.error('Telegram webhook secrets are missing');
+      return Response.json({ error: 'Webhook is not configured' }, { status: 500 });
+    }
+    if (req.headers.get('X-Telegram-Bot-Api-Secret-Token') !== webhookSecret) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    let update: unknown;
+    try {
+      update = await req.json();
+    } catch {
+      return Response.json({ error: 'Invalid JSON' }, { status: 400 });
+    }
+
+    const message = parseIncomingTelegramMessage(update);
+    if (!message) return Response.json({ status: 'ignored' });
+
+    try {
+      const status = await handleTelegramMessage(
+        message,
+        createTelegramDependencies(ctx.supabaseAdmin, botToken),
+      );
+      return Response.json({ status });
+    } catch {
+      console.error('Failed to process Telegram message');
+      return Response.json({ error: 'Unable to process message' }, { status: 500 });
+    }
   }),
 };
-
-/* To invoke locally:
-
-  1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
-  2. Make an HTTP request:
-
-  curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/telegram-webhook' \
-    --header 'Content-Type: application/json' \
-    --data '{"name":"Functions"}'
-
-*/
