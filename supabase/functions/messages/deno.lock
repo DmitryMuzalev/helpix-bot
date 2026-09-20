@@ -292,7 +292,8 @@
   "workspace": {
     "dependencies": [
       "jsr:@supabase/functions-js@2",
-      "npm:@supabase/server@1"
+      "npm:@supabase/server@1",
+      "npm:@supabase/supabase-js@2"
     ]
   }
 }
