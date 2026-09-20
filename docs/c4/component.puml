@@ -1,0 +1,33 @@
+@startuml helpix-telegram-webhook-component
+!include <C4/C4_Component>
+LAYOUT_LEFT_RIGHT()
+
+title telegram-webhook — Component
+
+System_Ext(telegram, "Telegram")
+ContainerDb(database, "Postgres", "PostgreSQL", "Таблицы clients и messages")
+
+Container_Boundary(webhook, "telegram-webhook · Edge Function") {
+  Component(entry, "HTTP-обработчик", "telegram-webhook/index.ts", "Проверяет метод и секрет, возвращает ответ")
+  Component(parser, "Парсер обновления", "adapters/telegram-update.ts", "Извлекает сообщение из Telegram update")
+  Component(usecase, "Обработка сообщения", "application/handle-telegram-message.ts", "Сохраняет сообщение и отправляет ответ")
+  Component(domain, "Правила ответа и типы", "domain/support-message.ts", "Формирует текст ответа")
+  Component(wiring, "Сборка зависимостей", "infrastructure/telegram-dependencies.ts", "Создаёт адаптеры для сценария")
+  Component(repository, "Хранение клиентов и сообщений", "adapters/telegram-repository.ts", "Обращается к базе данных")
+  Component(messenger, "Отправка ответа", "adapters/telegram-messenger.ts", "Вызывает Telegram Bot API")
+}
+
+Rel(telegram, entry, "Передаёт update", "HTTPS POST")
+Rel(entry, parser, "Разбирает update")
+Rel(entry, wiring, "Создаёт зависимости")
+Rel(entry, usecase, "Передаёт сообщение")
+Rel(wiring, repository, "Создаёт")
+Rel(wiring, messenger, "Создаёт")
+Rel(usecase, domain, "Формирует текст ответа")
+Rel(usecase, repository, "Сохраняет и проверяет дубликат")
+Rel(usecase, messenger, "Отправляет ответ")
+Rel(repository, database, "Читает и записывает", "Supabase client")
+Rel(messenger, telegram, "Отправляет ответ", "Bot API: sendMessage")
+
+SHOW_LEGEND()
+@enduml

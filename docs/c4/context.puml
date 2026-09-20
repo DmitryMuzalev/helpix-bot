@@ -1,0 +1,18 @@
+@startuml helpix-context
+!include <C4/C4_Context>
+LAYOUT_LEFT_RIGHT()
+
+title Helpix Bot — Context
+
+Person(customer, "Клиент", "Описывает проблему в Telegram")
+Person(consumer, "Потребитель API", "Получает клиентов и сообщения")
+System_Ext(telegram, "Telegram", "Доставляет обновления и сообщения")
+System(helpix, "Helpix Bot", "Сохраняет обращения и отвечает клиентам")
+
+Rel(customer, telegram, "Отправляет сообщения")
+Rel(telegram, helpix, "Передаёт входящие сообщения", "HTTPS webhook")
+Rel(helpix, telegram, "Отправляет ответы", "Telegram Bot API")
+Rel(consumer, helpix, "Получает клиентов и сообщения", "HTTPS GET")
+
+SHOW_LEGEND()
+@enduml

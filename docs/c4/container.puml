@@ -1,0 +1,28 @@
+@startuml helpix-container
+!include <C4/C4_Container>
+LAYOUT_LEFT_RIGHT()
+
+title Helpix Bot — Container
+
+Person(customer, "Клиент")
+Person(consumer, "Потребитель API")
+System_Ext(telegram, "Telegram")
+
+System_Boundary(helpix, "Helpix Bot · Supabase") {
+  Container(webhook, "telegram-webhook", "Edge Function, TypeScript", "Принимает обновления и отвечает")
+  Container(clients_api, "clients", "Edge Function, TypeScript", "Возвращает список клиентов")
+  Container(messages_api, "messages", "Edge Function, TypeScript", "Возвращает список сообщений")
+  ContainerDb(database, "Postgres", "PostgreSQL", "Таблицы clients и messages")
+}
+
+Rel(customer, telegram, "Отправляет сообщения")
+Rel(telegram, webhook, "Передаёт обновления", "HTTPS POST")
+Rel(webhook, telegram, "Отправляет ответы", "Bot API: sendMessage")
+Rel(webhook, database, "Читает и записывает", "Supabase client")
+Rel(consumer, clients_api, "Получает клиентов", "GET /functions/v1/clients")
+Rel(consumer, messages_api, "Получает сообщения", "GET /functions/v1/messages")
+Rel(clients_api, database, "Читает клиентов", "Supabase client")
+Rel(messages_api, database, "Читает сообщения", "Supabase client")
+
+SHOW_LEGEND()
+@enduml
