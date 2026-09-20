@@ -51,7 +51,6 @@ export function createTelegramRepository(db: SupabaseClient) {
         telegram_update_id: message.eventId,
         sender: CLIENT_SENDER,
         message_text: message.text,
-        telegram_payload: message.payload,
         sent_at: message.sentAt,
       });
 
@@ -66,7 +65,7 @@ export function createTelegramRepository(db: SupabaseClient) {
         .select('id')
         .eq('client_id', clientId)
         .eq('sender', BOT_SENDER)
-        .contains('telegram_payload', { _reply_to_update_id: eventId })
+        .eq('reply_to_update_id', eventId)
         .limit(1);
 
       if (error) throw error;
@@ -83,7 +82,7 @@ export function createTelegramRepository(db: SupabaseClient) {
         telegram_message_id: message.messageId,
         sender: BOT_SENDER,
         message_text: message.text,
-        telegram_payload: { ...message.payload, _reply_to_update_id: eventId },
+        reply_to_update_id: eventId,
         sent_at: message.sentAt,
       });
 

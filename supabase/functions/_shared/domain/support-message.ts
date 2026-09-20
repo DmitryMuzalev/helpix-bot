@@ -9,14 +9,12 @@ export interface IncomingSupportMessage {
   text: string | null;
   kind: 'start' | 'message';
   sentAt: string;
-  payload: Record<string, unknown>;
 }
 
 export interface OutgoingSupportMessage {
   messageId: number;
   text: string;
   sentAt: string;
-  payload: Record<string, unknown>;
 }
 
 export function createReplyText(message: IncomingSupportMessage): string {

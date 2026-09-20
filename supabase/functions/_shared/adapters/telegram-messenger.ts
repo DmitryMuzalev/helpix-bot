@@ -32,7 +32,6 @@ export function createTelegramMessenger(botToken: string) {
         messageId: body.result.message_id as number,
         text,
         sentAt: new Date((body.result.date as number) * 1000).toISOString(),
-        payload: body.result,
       };
     },
   };

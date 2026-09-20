@@ -15,7 +15,6 @@ const message: IncomingSupportMessage = {
   text: 'My computer is broken',
   kind: 'message',
   sentAt: '2026-01-01T00:00:00.000Z',
-  payload: {},
 };
 
 function createDependencies(
@@ -38,7 +37,7 @@ function createDependencies(
     },
     async sendMessage() {
       events.push('send');
-      return { messageId: 21, text: 'Reply', sentAt: message.sentAt, payload: {} };
+      return { messageId: 21, text: 'Reply', sentAt: message.sentAt };
     },
     async saveOutgoing() {
       events.push('outgoing');

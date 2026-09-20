@@ -36,6 +36,5 @@ export function parseIncomingTelegramMessage(update: unknown): IncomingSupportMe
     text,
     kind: text?.startsWith('/start') ? 'start' : 'message',
     sentAt: sentAt.toISOString(),
-    payload: message,
   };
 }
