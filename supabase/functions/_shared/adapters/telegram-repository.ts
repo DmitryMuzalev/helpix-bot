@@ -7,23 +7,41 @@ const BOT_SENDER = 'bot';
 export function createTelegramRepository(db: SupabaseClient) {
   return {
     async saveClient(message: IncomingSupportMessage): Promise<number> {
+      const client = {
+        telegram_chat_id: message.conversationId,
+        username: message.username,
+        first_name: message.firstName,
+        last_name: message.lastName,
+      };
+
+      async function updateExistingClient(): Promise<number | null> {
+        const { data, error } = await db
+          .from('clients')
+          .update(client)
+          .eq('telegram_user_id', message.customerId)
+          .select('id')
+          .maybeSingle();
+
+        if (error) throw error;
+        return data?.id ?? null;
+      }
+
+      const existingId = await updateExistingClient();
+      if (existingId !== null) return existingId;
+
       const { data, error } = await db
         .from('clients')
-        .upsert(
-          {
-            telegram_user_id: message.customerId,
-            telegram_chat_id: message.conversationId,
-            username: message.username,
-            first_name: message.firstName,
-            last_name: message.lastName,
-          },
-          { onConflict: 'telegram_user_id' },
-        )
+        .insert({ ...client, telegram_user_id: message.customerId })
         .select('id')
         .single();
 
-      if (error) throw error;
-      return data.id;
+      if (!error) return data.id;
+      if (error.code === '23505') {
+        // Another request may have inserted this Telegram user after our update.
+        const concurrentId = await updateExistingClient();
+        if (concurrentId !== null) return concurrentId;
+      }
+      throw error;
     },
 
     async saveIncoming(clientId: number, message: IncomingSupportMessage): Promise<boolean> {
