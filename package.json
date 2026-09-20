@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
+    "functions:deploy": "supabase functions deploy",
     "webhook:set": "node --env-file=.env scripts/register-telegram-webhook.mjs"
   },
   "keywords": [],
