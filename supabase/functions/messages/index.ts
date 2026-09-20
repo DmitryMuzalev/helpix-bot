@@ -15,8 +15,8 @@ export default {
     try {
       const messages = await listAllPages(createMessageReader(ctx.supabaseAdmin));
       return Response.json(messages);
-    } catch (error) {
-      console.error('Failed to list messages:', error);
+    } catch {
+      console.error('Failed to list messages');
       return Response.json({ error: 'Unable to load messages' }, { status: 500 });
     }
   }),

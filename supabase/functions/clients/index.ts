@@ -15,8 +15,8 @@ export default {
     try {
       const clients = await listAllPages(createClientReader(ctx.supabaseAdmin));
       return Response.json(clients);
-    } catch (error) {
-      console.error('Failed to list clients:', error);
+    } catch {
+      console.error('Failed to list clients');
       return Response.json({ error: 'Unable to load clients' }, { status: 500 });
     }
   }),
