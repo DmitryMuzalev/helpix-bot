@@ -5,7 +5,7 @@ export function createClientReader(db: SupabaseClient) {
     const { data, error } = await db
       .from('clients')
       .select('*')
-      .order('last_message_at', { ascending: false, nullsFirst: false })
+      .order('created_at', { ascending: false })
       .order('id', { ascending: false })
       .range(from, to);
 
