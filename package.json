@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
+    "typecheck": "deno check --config supabase/functions/clients/deno.json supabase/functions/clients/index.ts && deno check --config supabase/functions/messages/deno.json supabase/functions/messages/index.ts && deno check --config supabase/functions/telegram-webhook/deno.json supabase/functions/telegram-webhook/index.ts",
     "db:migrate": "supabase db push --linked --skip-vault",
     "functions:deploy": "supabase functions deploy",
     "webhook:set": "node --env-file=.env scripts/register-telegram-webhook.mjs"

@@ -1,7 +1,11 @@
 import '@supabase/functions-js/edge-runtime.d.ts';
 import { withSupabase } from '@supabase/server';
-import { listAllPages } from '../_shared/application/list-all-pages.ts';
-import { createMessageReader } from '../_shared/adapters/message-reader.ts';
+import {
+  listClientMessages,
+  parseMessagePageRequest,
+} from '../_shared/application/list-client-messages.ts';
+import { InvalidMessagePageRequest } from '../_shared/domain/message-page.ts';
+import { createMessageDependencies } from '../_shared/infrastructure/message-dependencies.ts';
 
 export default {
   fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
@@ -13,9 +17,14 @@ export default {
     }
 
     try {
-      const messages = await listAllPages(createMessageReader(ctx.supabaseAdmin));
+      const request = parseMessagePageRequest(new URL(req.url).searchParams);
+      const { loadPage } = createMessageDependencies(ctx.supabaseAdmin);
+      const messages = await listClientMessages(request, loadPage);
       return Response.json(messages);
-    } catch {
+    } catch (error) {
+      if (error instanceof InvalidMessagePageRequest) {
+        return Response.json({ error: error.message }, { status: 400 });
+      }
       console.error('Failed to list messages');
       return Response.json({ error: 'Unable to load messages' }, { status: 500 });
     }

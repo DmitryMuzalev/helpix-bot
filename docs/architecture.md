@@ -10,4 +10,6 @@
 
 Потребитель API обозначает любое приложение, которое вызывает функции `clients` и `messages`; отдельного интерфейса оператора в репозитории нет. Таблицы `clients` и `messages`, ограничения и триггер обновления `clients.last_message_at` определены в миграции `supabase/migrations/20260919160802_create_clients_and_messages.sql`.
 
-Функции `clients` и `messages` используют общий сценарий `application/list-all-pages.ts` и отдельные адаптеры чтения `client-reader.ts` и `message-reader.ts`.
+Функция `clients` использует сценарий `application/list-all-pages.ts` и адаптер `client-reader.ts`. Функция `messages` использует сценарий `application/list-client-messages.ts`: проверяет параметры и возвращает одну страницу переписки выбранного клиента. Адаптер `message-reader.ts` фильтрует записи по клиенту и курсору; зависимости собираются в `infrastructure/message-dependencies.ts`.
+
+Сообщения сортируются по `sent_at DESC, id DESC`. Курсор содержит ID клиента, время и ID последнего возвращённого сообщения. Следующая страница выбирает более старые записи, включая сообщения с тем же временем и меньшим ID. Индекс для этой выборки задан в миграции `supabase/migrations/20261005120000_add_messages_history_index.sql`.
