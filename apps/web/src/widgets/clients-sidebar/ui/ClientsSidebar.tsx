@@ -41,11 +41,6 @@ export function ClientsSidebar({ selectedId }: { selectedId: number | null }) {
         <SearchClientsInput value={search} onChange={handleSearchChange} />
       </div>
 
-      <div className="flex items-center gap-2 px-5 pb-3 text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
-        <span className="size-1.5 rounded-full bg-secondary/70" />
-        {isSearching ? `Найдено: ${filtered.length}` : 'Последняя активность'}
-      </div>
-
       <div className="quiet-scroll min-h-0 flex-1 overflow-y-auto px-2 pb-3">
         {clients.isPending ? (
           <div aria-label="Загрузка клиентов" className="space-y-2 p-2">
@@ -130,10 +125,6 @@ export function ClientsSidebar({ selectedId }: { selectedId: number | null }) {
             Не удалось обновить список. Показываем сохранённые данные.
           </p>
         )}
-      </div>
-      <div className="flex items-center gap-2 border-t px-5 py-4 text-[11px] text-muted-foreground">
-        <span className="size-1.5 rounded-full bg-primary/60" />
-        Обращения из Telegram
       </div>
     </aside>
   );

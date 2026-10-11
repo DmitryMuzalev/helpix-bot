@@ -48,15 +48,7 @@ export function SupportWorkspacePage() {
 
       <main className="flex min-h-0 flex-1 flex-col px-0 pt-0 pb-0 md:px-8 md:pt-6 md:pb-7">
         <div className="mb-5 hidden shrink-0 items-end justify-between md:flex">
-          <div>
-            <div className="mb-2 flex items-center gap-2 text-[10px] font-medium tracking-[0.15em] text-secondary/80 uppercase">
-              <span className="h-px w-5 bg-secondary/70" /> Всегда на связи
-            </div>
-            <h1 className="text-[28px] leading-tight font-bold tracking-[-0.04em]">Сообщения</h1>
-            <p className="mt-1.5 text-xs text-muted-foreground">
-              Все обращения клиентов — в одном месте.
-            </p>
-          </div>
+          <h1 className="text-[28px] leading-tight font-bold tracking-[-0.04em]">Сообщения</h1>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button

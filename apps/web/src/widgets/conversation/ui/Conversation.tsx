@@ -1,7 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, MessageSquare, RefreshCw, Send, ShieldCheck } from 'lucide-react';
-import { Badge } from '@/shared/ui/badge';
+import { ArrowLeft, MessageSquare, RefreshCw } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
@@ -42,12 +41,6 @@ export function Conversation({ clientId }: { clientId: number }) {
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-3">
-          <Badge
-            variant="outline"
-            className="hidden gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-normal text-muted-foreground sm:flex"
-          >
-            <Send className="size-3 text-secondary" aria-hidden="true" /> Telegram
-          </Badge>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -99,10 +92,6 @@ export function Conversation({ clientId }: { clientId: number }) {
           Не удалось обновить переписку. Показываем сохранённые сообщения.
         </div>
       )}
-      <footer className="flex min-h-14 shrink-0 items-center justify-center gap-2 border-t px-4 text-center text-[10px] text-muted-foreground md:text-[11px]">
-        <ShieldCheck className="size-3.5 shrink-0 text-secondary/60" aria-hidden="true" />
-        Просмотр переписки <span aria-hidden="true">·</span> Обновляется автоматически
-      </footer>
     </section>
   );
 }
