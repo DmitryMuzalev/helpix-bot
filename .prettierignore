@@ -3,3 +3,5 @@ coverage/
 dist/
 supabase/.temp/
 package-lock.json
+apps/web/playwright-report/
+apps/web/test-results/
