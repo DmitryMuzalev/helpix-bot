@@ -4,7 +4,7 @@ import {
 } from './handle-telegram-message.ts';
 import type { IncomingSupportMessage } from '../domain/support-message.ts';
 
-const message: IncomingSupportMessage = {
+const INCOMING_MESSAGE: IncomingSupportMessage = {
   eventId: 10,
   messageId: 20,
   conversationId: 30,
@@ -37,7 +37,7 @@ function createDependencies(
     },
     async sendMessage() {
       events.push('send');
-      return { messageId: 21, text: 'Reply', sentAt: message.sentAt };
+      return { messageId: 21, text: 'Reply', sentAt: INCOMING_MESSAGE.sentAt };
     },
     async saveOutgoing() {
       events.push('outgoing');
@@ -47,7 +47,10 @@ function createDependencies(
 
 Deno.test('stores both messages around the Telegram reply', async () => {
   const events: string[] = [];
-  const result = await handleTelegramMessage(message, createDependencies(events, true, false));
+  const result = await handleTelegramMessage(
+    INCOMING_MESSAGE,
+    createDependencies(events, true, false),
+  );
 
   if (result !== 'processed' || events.join(',') !== 'client,incoming,send,outgoing') {
     throw new Error(`Unexpected result: ${result}; events: ${events.join(',')}`);
@@ -56,7 +59,10 @@ Deno.test('stores both messages around the Telegram reply', async () => {
 
 Deno.test('does not send a second reply when one is already stored', async () => {
   const events: string[] = [];
-  const result = await handleTelegramMessage(message, createDependencies(events, false, true));
+  const result = await handleTelegramMessage(
+    INCOMING_MESSAGE,
+    createDependencies(events, false, true),
+  );
 
   if (result !== 'duplicate' || events.join(',') !== 'client,incoming,check-reply') {
     throw new Error(`Unexpected result: ${result}; events: ${events.join(',')}`);
@@ -65,7 +71,10 @@ Deno.test('does not send a second reply when one is already stored', async () =>
 
 Deno.test('retries a reply missing from storage', async () => {
   const events: string[] = [];
-  const result = await handleTelegramMessage(message, createDependencies(events, false, false));
+  const result = await handleTelegramMessage(
+    INCOMING_MESSAGE,
+    createDependencies(events, false, false),
+  );
 
   if (result !== 'processed' || events.join(',') !== 'client,incoming,check-reply,send,outgoing') {
     throw new Error(`Unexpected result: ${result}; events: ${events.join(',')}`);

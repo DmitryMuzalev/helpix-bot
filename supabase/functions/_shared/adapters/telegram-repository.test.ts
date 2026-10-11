@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { IncomingSupportMessage } from '../domain/support-message.ts';
 import { createTelegramRepository } from './telegram-repository.ts';
 
-const message: IncomingSupportMessage = {
+const INCOMING_MESSAGE: IncomingSupportMessage = {
   eventId: 10,
   messageId: 20,
   conversationId: 30,
@@ -30,7 +30,7 @@ function createDb(updateResults: Result[], insertResult: Result) {
           calls.push(`update:${values.first_name}`);
           return {
             eq(column: string, value: number) {
-              if (column !== 'telegram_user_id' || value !== message.customerId) {
+              if (column !== 'telegram_user_id' || value !== INCOMING_MESSAGE.customerId) {
                 throw new Error('Unexpected update filter');
               }
               return {
@@ -48,7 +48,7 @@ function createDb(updateResults: Result[], insertResult: Result) {
           };
         },
         insert(values: Record<string, unknown>) {
-          if (values.telegram_user_id !== message.customerId) {
+          if (values.telegram_user_id !== INCOMING_MESSAGE.customerId) {
             throw new Error('Unexpected inserted user');
           }
           calls.push('insert');
@@ -75,7 +75,7 @@ Deno.test('updates an existing client without inserting a row', async () => {
     error: null,
   });
 
-  const id = await createTelegramRepository(db).saveClient(message);
+  const id = await createTelegramRepository(db).saveClient(INCOMING_MESSAGE);
   if (id !== 1 || calls.join(',') !== 'update:Test') {
     throw new Error(`Unexpected result: ${id}; calls: ${calls.join(',')}`);
   }
@@ -87,7 +87,7 @@ Deno.test('inserts a client only when an update finds no row', async () => {
     error: null,
   });
 
-  const id = await createTelegramRepository(db).saveClient(message);
+  const id = await createTelegramRepository(db).saveClient(INCOMING_MESSAGE);
   if (id !== 3 || calls.join(',') !== 'update:Test,insert') {
     throw new Error(`Unexpected result: ${id}; calls: ${calls.join(',')}`);
   }
@@ -102,7 +102,7 @@ Deno.test('finds a client inserted concurrently after a unique conflict', async 
     { data: null, error: { code: '23505' } },
   );
 
-  const id = await createTelegramRepository(db).saveClient(message);
+  const id = await createTelegramRepository(db).saveClient(INCOMING_MESSAGE);
   if (id !== 3 || calls.join(',') !== 'update:Test,insert,update:Test') {
     throw new Error(`Unexpected result: ${id}; calls: ${calls.join(',')}`);
   }
@@ -138,12 +138,12 @@ Deno.test('stores messages without Telegram payload and finds the reply by updat
   } as unknown as SupabaseClient;
 
   const repository = createTelegramRepository(db);
-  const isNew = await repository.saveIncoming(1, message);
-  const hasReply = await repository.hasReply(1, message.eventId);
-  await repository.saveOutgoing(1, message.eventId, {
+  const isNew = await repository.saveIncoming(1, INCOMING_MESSAGE);
+  const hasReply = await repository.hasReply(1, INCOMING_MESSAGE.eventId);
+  await repository.saveOutgoing(1, INCOMING_MESSAGE.eventId, {
     messageId: 21,
     text: 'Reply',
-    sentAt: message.sentAt,
+    sentAt: INCOMING_MESSAGE.sentAt,
   });
 
   if (!isNew || !hasReply || rows.length !== 2) throw new Error('Messages were not saved');
@@ -151,8 +151,8 @@ Deno.test('stores messages without Telegram payload and finds the reply by updat
     throw new Error('Raw Telegram payload was saved');
   }
   if (
-    rows[0].telegram_update_id !== message.eventId ||
-    rows[1].reply_to_update_id !== message.eventId
+    rows[0].telegram_update_id !== INCOMING_MESSAGE.eventId ||
+    rows[1].reply_to_update_id !== INCOMING_MESSAGE.eventId
   ) {
     throw new Error('Telegram update and reply are not linked');
   }
@@ -161,7 +161,7 @@ Deno.test('stores messages without Telegram payload and finds the reply by updat
     JSON.stringify([
       ['client_id', 1],
       ['sender', 'bot'],
-      ['reply_to_update_id', message.eventId],
+      ['reply_to_update_id', INCOMING_MESSAGE.eventId],
     ])
   ) {
     throw new Error(`Unexpected reply lookup: ${JSON.stringify(filters)}`);

@@ -13,7 +13,7 @@ function positiveInteger(value: string | null, name: string): number {
   return Number(value);
 }
 
-function validTimestamp(value: unknown): value is string {
+function isValidTimestamp(value: unknown): value is string {
   if (typeof value !== 'string') return false;
   const match =
     /^(\d{4}-\d{2}-\d{2})T([01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d{1,6})?(Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$/.exec(
@@ -40,7 +40,7 @@ function decodeCursor(value: string, clientId: number): MessageCursor {
       !Number.isSafeInteger(cursor.id) ||
       cursor.id <= 0 ||
       !('sentAt' in cursor) ||
-      !validTimestamp(cursor.sentAt)
+      !isValidTimestamp(cursor.sentAt)
     ) {
       throw new Error();
     }
