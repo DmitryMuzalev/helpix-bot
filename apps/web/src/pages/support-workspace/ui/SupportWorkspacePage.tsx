@@ -1,7 +1,8 @@
-import { Link, useParams } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
 import { Inbox, MessageSquare, Send } from 'lucide-react';
 import { ClientsSidebar } from '@/widgets/clients-sidebar';
 import { Conversation } from '@/widgets/conversation';
+import { WorkspaceHeader } from '@/widgets/workspace-header';
 import { useSupportRealtime } from '../model/useSupportRealtime';
 
 export function SupportWorkspacePage() {
@@ -11,35 +12,7 @@ export function SupportWorkspacePage() {
 
   return (
     <div className="workspace-background flex h-dvh min-h-0 flex-col overflow-hidden">
-      <header className="flex h-18 shrink-0 items-center justify-between border-b px-5 md:px-8">
-        <div className="flex items-center gap-4 md:gap-6">
-          <Link
-            to="/clients"
-            aria-label="Helpix — к списку клиентов"
-            className="flex items-center gap-2.5 rounded-md focus-visible:outline-2 focus-visible:outline-ring"
-          >
-            <img src="/favicon.svg" alt="" className="size-8 shrink-0" aria-hidden="true" />
-            <span className="text-xl font-extrabold tracking-[-0.06em]">
-              helpix<span className="text-primary">.</span>
-            </span>
-          </Link>
-          <span className="h-5 w-px bg-border" aria-hidden="true" />
-          <span className="text-xs font-medium text-muted-foreground md:text-sm">
-            Центр поддержки
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="hidden rounded-full border bg-muted/30 px-3 py-1.5 text-[10px] text-muted-foreground sm:block">
-            Рабочее пространство
-          </span>
-          <div
-            className="flex size-8 items-center justify-center rounded-full border border-secondary/30 bg-secondary/10 text-[11px] font-bold text-secondary"
-            aria-label="Оператор поддержки"
-          >
-            ОП
-          </div>
-        </div>
-      </header>
+      <WorkspaceHeader />
 
       {isRealtimeUnavailable && (
         <p role="status" className="border-b px-5 py-2 text-xs text-destructive md:px-8">
