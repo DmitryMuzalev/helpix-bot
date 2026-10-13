@@ -1,18 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
-import { Inbox, MessageSquare, RefreshCw, Send } from 'lucide-react';
-import { Button } from '@/shared/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
+import { Inbox, MessageSquare, Send } from 'lucide-react';
 import { ClientsSidebar } from '@/widgets/clients-sidebar';
 import { Conversation } from '@/widgets/conversation';
-import { clientsQuery } from '@/entities/client';
-import { cn } from '@/shared/lib/class-names';
+import { useSupportRealtime } from '../model/useSupportRealtime';
 
 export function SupportWorkspacePage() {
   const { clientId } = useParams({ strict: false });
   const selectedId = clientId === undefined ? null : Number(clientId);
-  const clients = useQuery(clientsQuery);
-  const handleRefreshClients = () => void clients.refetch();
+  const { isRealtimeUnavailable } = useSupportRealtime(selectedId);
 
   return (
     <div className="workspace-background flex h-dvh min-h-0 flex-col overflow-hidden">
@@ -46,26 +41,16 @@ export function SupportWorkspacePage() {
         </div>
       </header>
 
+      {isRealtimeUnavailable && (
+        <p role="status" className="border-b px-5 py-2 text-xs text-destructive md:px-8">
+          Автообновление недоступно. Данные обновятся после восстановления соединения.
+        </p>
+      )}
+
       <main className="flex min-h-0 flex-1 flex-col px-0 pt-0 pb-0 md:px-8 md:pt-6 md:pb-7">
-        <div className="mb-5 hidden shrink-0 items-end justify-between md:flex">
-          <h1 className="text-[28px] leading-tight font-bold tracking-[-0.04em]">Сообщения</h1>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 rounded-full bg-card/50 text-xs"
-                onClick={handleRefreshClients}
-                disabled={clients.isFetching}
-                aria-label="Обновить список клиентов"
-              >
-                <RefreshCw className={cn('size-3.5', clients.isFetching && 'animate-spin')} />{' '}
-                Обновить
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Обновить список клиентов</TooltipContent>
-          </Tooltip>
-        </div>
+        <h1 className="mb-5 hidden shrink-0 text-[28px] leading-tight font-bold tracking-[-0.04em] md:block">
+          Сообщения
+        </h1>
 
         <div className="flex min-h-0 flex-1 overflow-hidden border-border md:rounded-2xl md:border md:shadow-[0_20px_80px_#00000020]">
           <ClientsSidebar selectedId={selectedId} />

@@ -5,5 +5,4 @@ export const clientsQuery = queryOptions({
   queryKey: ['clients'],
   queryFn: ({ signal }) => getClients(signal),
   staleTime: 15_000,
-  refetchInterval: 30_000,
 });

@@ -8,7 +8,6 @@ export function messagesQuery(clientId: number) {
     initialPageParam: null as string | null,
     getNextPageParam: (page) => page.nextCursor,
     staleTime: 10_000,
-    refetchInterval: 15_000,
   });
 }
 

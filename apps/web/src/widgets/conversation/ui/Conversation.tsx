@@ -1,25 +1,23 @@
 import { Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, MessageSquare, RefreshCw } from 'lucide-react';
+import { ArrowLeft, MessageSquare } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Skeleton } from '@/shared/ui/skeleton';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
 import { MessageTimeline } from './MessageTimeline';
 import { StatePanel } from '@/shared/ui/StatePanel';
 import { ClientAvatar, clientName, clientsQuery } from '@/entities/client';
 import { useClientMessages } from '@/entities/message';
-import { cn } from '@/shared/lib/class-names';
 
 export function Conversation({ clientId }: { clientId: number }) {
   const clients = useQuery(clientsQuery);
   const messages = useClientMessages(clientId);
   const client = clients.data?.find((item) => item.id === clientId);
   const isClientMissing = clients.isSuccess && !client;
-  const handleRefreshMessages = () => void messages.refetch();
+  const handleRetryMessages = () => void messages.refetch();
 
   return (
     <section aria-label="Диалог с клиентом" className="flex min-h-0 min-w-0 flex-1 flex-col">
-      <header className="flex min-h-21 shrink-0 items-center justify-between gap-3 border-b bg-background/80 px-4 md:px-7">
+      <header className="flex min-h-21 shrink-0 items-center gap-3 border-b bg-background/80 px-4 md:px-7">
         <div className="flex min-w-0 items-center gap-3">
           <Button asChild variant="ghost" size="icon" className="-ml-1 shrink-0 md:hidden">
             <Link to="/clients" aria-label="Назад к клиентам">
@@ -40,23 +38,6 @@ export function Conversation({ clientId }: { clientId: number }) {
             </p>
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-3">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Обновить переписку"
-                disabled={messages.isFetching}
-                onClick={handleRefreshMessages}
-                className="size-9 text-muted-foreground"
-              >
-                <RefreshCw className={cn('size-4', messages.isFetching && 'animate-spin')} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Обновить переписку</TooltipContent>
-          </Tooltip>
-        </div>
       </header>
 
       {isClientMissing ? (
@@ -75,7 +56,7 @@ export function Conversation({ clientId }: { clientId: number }) {
         <StatePanel
           title="Переписка не загрузилась"
           description={messages.error.message}
-          onRetry={handleRefreshMessages}
+          onRetry={handleRetryMessages}
         />
       ) : !messages.data?.pages.some((page) => page.items.length > 0) ? (
         <StatePanel

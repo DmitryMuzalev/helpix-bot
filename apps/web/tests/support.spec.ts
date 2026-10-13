@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import type { Client } from '../src/entities/client';
 import type { SupportMessage } from '../src/entities/message';
+import { mockRealtime } from './helpers/realtime';
 
 const TEST_CLIENTS: Client[] = [
   ['Анна', 'Смирнова', 'anna_smirnova'],
@@ -40,12 +41,18 @@ function makeMessage(id: number, clientId = 1): SupportMessage {
 
 async function mockApi(page: Page) {
   const state = {
-    rows: Array.from({ length: 65 }, (_, index) => makeMessage(index + 1)),
+    realtime: await mockRealtime(page),
+    clients: TEST_CLIENTS.map((client) => ({ ...client })),
+    rows: [
+      ...Array.from({ length: 65 }, (_, index) => makeMessage(index + 1)),
+      makeMessage(101, 2),
+    ],
     requests: [] as URL[],
     clientStatus: 200,
     messageStatus: 200,
     historyStatus: 200,
     beforeHistoryResponse: null as (() => Promise<void>) | null,
+    beforeMessageResponse: null as (() => Promise<void>) | null,
   };
   await page.route('**/functions/v1/**', async (route) => {
     const url = new URL(route.request().url());
@@ -66,7 +73,7 @@ async function mockApi(page: Page) {
       await route.fulfill({
         status: state.clientStatus,
         headers: { 'Access-Control-Allow-Origin': '*' },
-        json: TEST_CLIENTS,
+        json: state.clients,
       });
       return;
     }
@@ -77,9 +84,11 @@ async function mockApi(page: Page) {
     if (cursor && state.beforeHistoryResponse) await state.beforeHistoryResponse();
     const status = cursor ? state.historyStatus : state.messageStatus;
     const beforeId = cursor ? Number(cursor.replace('before-', '')) : Infinity;
-    const rows = clientId === 1 ? state.rows : clientId === 2 ? [makeMessage(101, 2)] : [];
-    const matching = rows.filter((row) => row.id < beforeId).toSorted((a, b) => b.id - a.id);
+    const matching = state.rows
+      .filter((row) => row.client_id === clientId && row.id < beforeId)
+      .toSorted((a, b) => b.id - a.id);
     const items = matching.slice(0, 20);
+    if (!cursor && state.beforeMessageResponse) await state.beforeMessageResponse();
     await route.fulfill({
       status,
       headers: { 'Access-Control-Allow-Origin': '*' },
@@ -186,7 +195,7 @@ test('loads older pages upwards without moving the visible message or duplicatin
   ).toEqual(['before-46', 'before-26', 'before-6']);
 });
 
-test('keeps a reader in place on refresh and scrolls to new messages only at the bottom', async ({
+test('keeps a reader in place on realtime updates and scrolls to new messages only at the bottom', async ({
   page,
 }) => {
   const state = await mockApi(page);
@@ -198,7 +207,7 @@ test('keeps a reader in place on refresh and scrolls to new messages only at the
   await expect(page.getByRole('button', { name: 'К последним сообщениям' })).toBeVisible();
   const before = await visibleAnchor(page);
   state.rows.push(makeMessage(66));
-  await page.getByRole('button', { name: 'Обновить переписку' }).click();
+  state.realtime.emitChange('messages', makeMessage(66));
   await expect(page.locator('[data-message-id="66"]')).toBeVisible();
   const after = await visibleAnchor(page);
   expect(after.id).toBe(before.id);
@@ -207,7 +216,7 @@ test('keeps a reader in place on refresh and scrolls to new messages only at the
   await expect(page.locator('[data-message-id="66"]')).toBeInViewport();
   await expect(page.getByRole('button', { name: 'К последним сообщениям' })).toHaveCount(0);
   state.rows.push(makeMessage(67));
-  await page.getByRole('button', { name: 'Обновить переписку' }).click();
+  state.realtime.emitChange('messages', makeMessage(67));
   await expect(page.locator('[data-message-id="67"]')).toBeInViewport();
 });
 
@@ -284,4 +293,97 @@ test('works on mobile, supports direct links and browser back without horizontal
   await expect(page.locator('[data-message-id="101"]')).toBeInViewport();
   await page.goBack();
   await expect(page).toHaveURL(/\/clients$/);
+});
+
+test('does not poll idle data and updates the sidebar from realtime events', async ({ page }) => {
+  await page.clock.install();
+  const state = await mockApi(page);
+  await openConversation(page);
+  await expect.poll(() => state.realtime.subscriptions.size).toBe(1);
+  await page.waitForLoadState('networkidle');
+  const requestCount = state.requests.length;
+  await page.clock.fastForward(60_000);
+  // Allow any requests started by the advanced timers to reach the API mock.
+  await page.waitForTimeout(300);
+  expect(state.requests).toHaveLength(requestCount);
+
+  state.clients[1].last_message_at = '2026-10-12T10:00:00Z';
+  state.realtime.emitChange('clients', state.clients[1], 'UPDATE');
+  const clientLinks = page.getByRole('navigation', { name: 'Список клиентов' }).getByRole('link');
+  await expect(clientLinks.first()).toContainText('Михаил Волков');
+
+  const newClient = { ...TEST_CLIENTS[0], id: 7, first_name: 'Ирина', last_name: 'Новикова' };
+  state.clients.push(newClient);
+  state.realtime.emitChange('clients', newClient);
+  await expect(clientLinks).toHaveCount(7);
+  await expect(page.getByRole('link', { name: /Ирина Новикова/ })).toBeVisible();
+});
+
+test('recovers missed messages after reconnecting and reports connection failures', async ({
+  page,
+}) => {
+  const state = await mockApi(page);
+  await openConversation(page);
+  await expect.poll(() => state.realtime.subscriptions.size).toBe(1);
+  const joinCount = state.realtime.joinCount;
+  state.realtime.disconnect();
+  await expect(page.getByText(/Автообновление недоступно/)).toBeVisible();
+  state.rows.push(makeMessage(66));
+  await expect.poll(() => state.realtime.joinCount).toBeGreaterThan(joinCount);
+  await expect(page.locator('[data-message-id="66"]')).toBeInViewport();
+  await expect(page.getByText(/Автообновление недоступно/)).toHaveCount(0);
+});
+
+test('replaces the conversation subscription and ignores events for another client', async ({
+  page,
+}) => {
+  const state = await mockApi(page);
+  await openConversation(page);
+  await page.getByRole('link', { name: /Михаил Волков/ }).click();
+  await expect(page.locator('[data-message-id="101"]')).toBeInViewport();
+  await expect
+    .poll(() =>
+      [...state.realtime.subscriptions.values()].map(
+        (subscription) =>
+          subscription.filters.find((filter) => filter.table === 'messages')?.filter,
+      ),
+    )
+    .toEqual(['client_id=eq.2']);
+  await page.waitForLoadState('networkidle');
+  const messageRequestCount = state.requests.filter((url) =>
+    url.pathname.endsWith('/messages'),
+  ).length;
+  state.rows.push(makeMessage(66));
+  state.realtime.emitChange('messages', makeMessage(66));
+  await page.waitForTimeout(300);
+  expect(state.requests.filter((url) => url.pathname.endsWith('/messages'))).toHaveLength(
+    messageRequestCount,
+  );
+
+  state.rows.push(makeMessage(102, 2));
+  state.realtime.emitChange('messages', makeMessage(102, 2));
+  await expect(page.locator('[data-message-id="102"]')).toBeInViewport();
+  await expect(page.locator('[data-message-id="66"]')).toHaveCount(0);
+});
+
+test('fetches again when another message arrives during an ongoing refresh', async ({ page }) => {
+  const state = await mockApi(page);
+  await openConversation(page);
+  await expect.poll(() => state.realtime.subscriptions.size).toBe(1);
+  await page.waitForLoadState('networkidle');
+  let releaseResponse: (() => void) | null = null;
+  state.beforeMessageResponse = () => {
+    state.beforeMessageResponse = null;
+    return new Promise<void>((resolve) => {
+      releaseResponse = resolve;
+    });
+  };
+  state.rows.push(makeMessage(66));
+  state.realtime.emitChange('messages', makeMessage(66));
+  await expect.poll(() => releaseResponse !== null).toBe(true);
+  state.rows.push(makeMessage(67));
+  state.realtime.emitChange('messages', makeMessage(67));
+  releaseResponse!();
+  await expect(page.locator('[data-message-id="67"]')).toBeInViewport();
+  await expect(page.locator('[data-message-id]')).toHaveCount(20);
 });
