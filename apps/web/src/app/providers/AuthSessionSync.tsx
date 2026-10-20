@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, type Query } from '@tanstack/react-query';
 import { sessionQuery } from '@/entities/session';
 import { getSupabaseClient } from '@/shared/api';
 
@@ -12,8 +12,17 @@ export function AuthSessionSync() {
 
     const {
       data: { subscription },
-    } = supabaseClient.auth.onAuthStateChange((_, session) => {
+    } = supabaseClient.auth.onAuthStateChange((event, session) => {
+      const previousSession = queryClient.getQueryData(sessionQuery.queryKey);
       void queryClient.cancelQueries({ queryKey: sessionQuery.queryKey, exact: true });
+      if (event === 'SIGNED_OUT' || previousSession?.user.id !== session?.user.id) {
+        const dataQueries = {
+          predicate: (query: Query) => query.queryKey[0] !== sessionQuery.queryKey[0],
+        };
+        void queryClient.cancelQueries(dataQueries);
+        queryClient.removeQueries(dataQueries);
+        queryClient.getMutationCache().clear();
+      }
       queryClient.setQueryData(sessionQuery.queryKey, session);
     });
 
