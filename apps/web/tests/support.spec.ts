@@ -2,6 +2,11 @@ import { test, expect, type Page } from '@playwright/test';
 import type { Client } from '../src/entities/client';
 import type { SupportMessage } from '../src/entities/message';
 import { mockRealtime } from './helpers/realtime';
+import { seedSession } from './helpers/auth';
+
+test.beforeEach(async ({ page }) => {
+  await seedSession(page);
+});
 
 const TEST_CLIENTS: Client[] = [
   ['Анна', 'Смирнова', 'anna_smirnova'],

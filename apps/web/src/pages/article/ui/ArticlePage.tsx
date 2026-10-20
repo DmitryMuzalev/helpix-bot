@@ -10,7 +10,7 @@ import { Skeleton } from '@/shared/ui/skeleton';
 import { StatePanel } from '@/shared/ui/StatePanel';
 
 export function ArticlePage() {
-  const { articleId } = useParams({ from: '/articles/$articleId' });
+  const { articleId } = useParams({ from: '/authenticated/articles/$articleId' });
   const article = useQuery(articleQuery(Number(articleId)));
   const navigate = useNavigate();
   const isNotFound = article.error instanceof ApiError && article.error.status === 404;

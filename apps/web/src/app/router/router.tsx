@@ -4,13 +4,28 @@ import { SupportWorkspacePage } from '@/pages/support-workspace';
 import { ArticlesPage } from '@/pages/articles';
 import { ArticlePage } from '@/pages/article';
 import { ArticleEditorPage } from '@/pages/article-editor';
+import { LoginPage, validateLoginSearch } from '@/pages/login';
+import { AuthenticatedLayout } from './AuthenticatedLayout';
 
 const rootRoute = createRootRoute({
   notFoundComponent: NotFoundPage,
 });
 
-const indexRoute = createRoute({
+const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
+  path: '/login',
+  validateSearch: validateLoginSearch,
+  component: LoginPage,
+});
+
+const authenticatedRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  id: 'authenticated',
+  component: AuthenticatedLayout,
+});
+
+const indexRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
   path: '/',
   beforeLoad: () => {
     throw redirect({ to: '/clients' });
@@ -18,13 +33,13 @@ const indexRoute = createRoute({
 });
 
 const clientsRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedRoute,
   path: '/clients',
   component: SupportWorkspacePage,
 });
 
 const conversationRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedRoute,
   path: '/clients/$clientId',
   beforeLoad: ({ params }) => {
     if (!/^[1-9]\d*$/.test(params.clientId) || !Number.isSafeInteger(Number(params.clientId))) {
@@ -35,13 +50,13 @@ const conversationRoute = createRoute({
 });
 
 const articlesRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedRoute,
   path: '/articles',
   component: ArticlesPage,
 });
 
 const newArticleRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedRoute,
   path: '/articles/new',
   component: ArticleEditorPage,
 });
@@ -53,14 +68,14 @@ function validateArticleRoute({ params }: { params: { articleId: string } }) {
 }
 
 const articleRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedRoute,
   path: '/articles/$articleId',
   beforeLoad: validateArticleRoute,
   component: ArticlePage,
 });
 
 const editArticleRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authenticatedRoute,
   path: '/articles/$articleId/edit',
   beforeLoad: validateArticleRoute,
   component: ArticleEditorPage,
@@ -68,13 +83,16 @@ const editArticleRoute = createRoute({
 
 export const router = createRouter({
   routeTree: rootRoute.addChildren([
-    indexRoute,
-    clientsRoute,
-    conversationRoute,
-    articlesRoute,
-    newArticleRoute,
-    articleRoute,
-    editArticleRoute,
+    loginRoute,
+    authenticatedRoute.addChildren([
+      indexRoute,
+      clientsRoute,
+      conversationRoute,
+      articlesRoute,
+      newArticleRoute,
+      articleRoute,
+      editArticleRoute,
+    ]),
   ]),
   defaultPreload: 'intent',
 });

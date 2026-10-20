@@ -1,6 +1,11 @@
 import { test, expect, type Page } from '@playwright/test';
 import type { Article, ArticleInput } from '../src/entities/article';
 import { mockRealtime } from './helpers/realtime';
+import { seedSession } from './helpers/auth';
+
+test.beforeEach(async ({ page }) => {
+  await seedSession(page);
+});
 
 const TEST_ARTICLES: Article[] = [
   {
