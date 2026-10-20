@@ -1,8 +1,8 @@
-import { queryOptions } from "@tanstack/react-query";
-import { getSupabaseClient } from "@/shared/api";
+import { queryOptions } from '@tanstack/react-query';
+import { getSupabaseClient } from '@/shared/api';
 
 export const sessionQuery = queryOptions({
-  queryKey: ["session"],
+  queryKey: ['session'],
   queryFn: async () => {
     const supabaseClient = getSupabaseClient();
     if (!supabaseClient) return null;
@@ -14,5 +14,5 @@ export const sessionQuery = queryOptions({
   staleTime: Infinity,
   gcTime: Infinity,
   retry: false,
-  networkMode: "always",
+  networkMode: 'always',
 });
