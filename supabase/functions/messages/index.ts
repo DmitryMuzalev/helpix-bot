@@ -8,7 +8,7 @@ import { InvalidMessagePageRequest } from '../_shared/domain/message-page.ts';
 import { createMessageDependencies } from '../_shared/infrastructure/message-dependencies.ts';
 
 export default {
-  fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
     if (req.method !== 'GET') {
       return new Response('Method Not Allowed', {
         status: 405,
@@ -18,7 +18,7 @@ export default {
 
     try {
       const request = parseMessagePageRequest(new URL(req.url).searchParams);
-      const { loadPage } = createMessageDependencies(ctx.supabaseAdmin);
+      const { loadPage } = createMessageDependencies(ctx.supabase);
       const messages = await listClientMessages(request, loadPage);
       return Response.json(messages);
     } catch (error) {

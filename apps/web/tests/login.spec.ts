@@ -15,6 +15,7 @@ async function mockWorkspace(page: Page) {
       return;
     }
     requests.push(route.request().url());
+    expect(route.request().headers().authorization).toMatch(/^Bearer \S+$/);
     await route.fulfill({ headers, json: [] });
   });
   return requests;

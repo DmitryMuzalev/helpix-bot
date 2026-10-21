@@ -427,6 +427,7 @@ entrypoint = "./functions/telegram-webhook/index.ts"
 
 [functions.messages]
 enabled = true
+# @supabase/server verifies user JWTs inside the function, including CORS handling.
 verify_jwt = false
 import_map = "./functions/messages/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
@@ -438,6 +439,7 @@ entrypoint = "./functions/messages/index.ts"
 
 [functions.clients]
 enabled = true
+# @supabase/server verifies user JWTs inside the function, including CORS handling.
 verify_jwt = false
 import_map = "./functions/clients/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
@@ -449,6 +451,7 @@ entrypoint = "./functions/clients/index.ts"
 
 [functions.articles]
 enabled = true
+# @supabase/server verifies user JWTs inside the function, including CORS handling.
 verify_jwt = false
 import_map = "./functions/articles/deno.json"
 entrypoint = "./functions/articles/index.ts"

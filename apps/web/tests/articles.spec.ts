@@ -55,6 +55,7 @@ async function mockArticles(page: Page) {
       return;
     }
     expect(req.headers().apikey).toBe('public-test-key');
+    expect(req.headers().authorization).toMatch(/^Bearer \S+$/);
     const method = req.method();
     const id = url.searchParams.get('id');
     const body =

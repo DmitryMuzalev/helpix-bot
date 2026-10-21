@@ -1,5 +1,6 @@
 import { apiConfig } from '../config/api';
 import { ApiError } from './api-error';
+import { getSupabaseClient } from './supabase-client';
 
 interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -15,9 +16,19 @@ export async function request(
   const baseUrl = apiConfig.url;
   if (!baseUrl) throw new ApiError('Подключение к серверу ещё не настроено.', 0);
 
+  const supabaseClient = getSupabaseClient();
+  if (!supabaseClient) throw new ApiError('Подключение к серверу ещё не настроено.', 0);
+  const { data, error } = await supabaseClient.auth.getSession();
+  if (error || !data.session?.access_token) {
+    throw new ApiError('Сессия завершена. Войдите в аккаунт снова.', 401);
+  }
+
   const url = new URL(`${baseUrl}/functions/v1/${path}`);
   url.search = params.toString();
-  const headers: Record<string, string> = { Accept: 'application/json' };
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    Authorization: `Bearer ${data.session.access_token}`,
+  };
   const method = options.method ?? 'GET';
   const body = options.body === undefined ? undefined : JSON.stringify(options.body);
   if (body !== undefined) headers['Content-Type'] = 'application/json';

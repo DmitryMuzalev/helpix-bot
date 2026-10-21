@@ -74,6 +74,7 @@ async function mockApi(page: Page) {
     }
     state.requests.push(url);
     expect(route.request().headers().apikey).toBe('public-test-key');
+    expect(route.request().headers().authorization).toMatch(/^Bearer \S+$/);
     if (url.pathname.endsWith('/clients')) {
       await route.fulfill({
         status: state.clientStatus,
