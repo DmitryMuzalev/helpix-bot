@@ -146,9 +146,13 @@ test('lists and searches clients, opens a routed conversation with the latest me
     .evaluateAll((elements) => elements.map((e) => Number(e.getAttribute('data-message-id'))));
   expect(ids).toEqual(Array.from({ length: 20 }, (_, index) => index + 46));
   await page.evaluate(() => document.fonts.ready);
-  expect(await page.evaluate(() => document.fonts.check('400 14px "Manrope Variable"'))).toBe(true);
+  expect(
+    await page.evaluate(
+      async () => (await document.fonts.load('400 14px "IBM Plex Mono"', 'ПриветЁё')).length,
+    ),
+  ).toBeGreaterThan(0);
   expect(await page.evaluate(() => getComputedStyle(document.body).fontFamily)).toContain(
-    'Manrope Variable',
+    'IBM Plex Mono',
   );
   await page.screenshot({ path: 'test-results/helpix-desktop.png' });
 });

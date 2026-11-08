@@ -29,7 +29,7 @@ export function ClientsSidebar({ selectedId }: { selectedId: number | null }) {
       <div className="px-5 pt-6 pb-4">
         <div className="mb-5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <h2 className="text-lg font-bold tracking-tight">Клиенты</h2>
+            <h2 className="text-base font-medium">Клиенты</h2>
             {clients.data && (
               <Badge variant="outline" className="rounded-md px-1.5 text-muted-foreground">
                 {clients.data.length}
@@ -95,9 +95,7 @@ export function ClientsSidebar({ selectedId }: { selectedId: number | null }) {
                   <ClientAvatar client={client} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="truncate text-[13px] font-semibold">
-                        {clientName(client)}
-                      </span>
+                      <span className="truncate text-[13px] font-medium">{clientName(client)}</span>
                       <time
                         dateTime={client.last_message_at ?? undefined}
                         className={cn(

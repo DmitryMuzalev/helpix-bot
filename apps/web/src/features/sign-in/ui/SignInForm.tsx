@@ -31,7 +31,7 @@ export function SignInForm() {
   return (
     <form noValidate onSubmit={handleSubmit} className="space-y-5" aria-busy={login.isPending}>
       <div className="space-y-2">
-        <label htmlFor="login-email" className="text-sm font-semibold">
+        <label htmlFor="login-email" className="text-sm font-medium">
           Email
         </label>
         <Input
@@ -57,7 +57,7 @@ export function SignInForm() {
         )}
       </div>
       <div className="space-y-2">
-        <label htmlFor="login-password" className="text-sm font-semibold">
+        <label htmlFor="login-password" className="text-sm font-medium">
           Пароль
         </label>
         <Input

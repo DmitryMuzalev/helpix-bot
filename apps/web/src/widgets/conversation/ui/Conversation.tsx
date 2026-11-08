@@ -26,7 +26,7 @@ export function Conversation({ clientId }: { clientId: number }) {
           </Button>
           {client ? <ClientAvatar client={client} /> : <Skeleton className="size-11 rounded-2xl" />}
           <div className="min-w-0">
-            <h2 className="truncate text-sm font-bold md:text-base">
+            <h2 className="truncate text-sm font-medium md:text-base">
               {client
                 ? clientName(client)
                 : isClientMissing

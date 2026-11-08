@@ -41,7 +41,7 @@ export function ArticlePage() {
         ) : (
           <article className="rounded-2xl border bg-card/70 p-5 md:p-8">
             <div className="flex flex-wrap items-start justify-between gap-5">
-              <h1 className="w-full min-w-0 text-2xl leading-tight font-bold tracking-tight [overflow-wrap:anywhere] sm:w-auto sm:flex-1 md:text-3xl">
+              <h1 className="w-full min-w-0 text-xl leading-snug font-medium [overflow-wrap:anywhere] sm:w-auto sm:flex-1 md:text-2xl">
                 {article.data.title}
               </h1>
               <div className="flex flex-wrap gap-2">

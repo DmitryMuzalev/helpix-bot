@@ -20,7 +20,7 @@ export function MessageBubble({ message }: { message: SupportMessage }) {
         )}
       >
         {isBot && (
-          <div className="mb-1 flex items-center gap-1.5 text-[10px] font-semibold text-highlight">
+          <div className="mb-1 flex items-center gap-1.5 text-[10px] font-medium text-highlight">
             <Bot className="size-3.5" aria-hidden="true" /> Helpix · Бот
           </div>
         )}

@@ -52,7 +52,7 @@ export function DeleteArticleButton({ article, onDeleted }: DeleteArticleButtonP
             if (deletion.isPending) event.preventDefault();
           }}
         >
-          <AlertDialog.Title className="text-xl font-bold">Удалить статью?</AlertDialog.Title>
+          <AlertDialog.Title className="text-lg font-medium">Удалить статью?</AlertDialog.Title>
           <AlertDialog.Description className="mt-3 text-sm leading-6 text-muted-foreground [overflow-wrap:anywhere]">
             Статья «{article.title}» будет удалена. Восстановить её через панель не получится.
           </AlertDialog.Description>

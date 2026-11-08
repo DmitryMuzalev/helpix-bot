@@ -21,7 +21,7 @@ export function SupportWorkspacePage() {
       )}
 
       <main className="flex min-h-0 flex-1 flex-col px-0 pt-0 pb-0 md:px-8 md:pt-6 md:pb-7">
-        <h1 className="mb-5 hidden shrink-0 text-[28px] leading-tight font-bold tracking-[-0.04em] md:block">
+        <h1 className="mb-5 hidden shrink-0 text-2xl leading-tight font-medium md:block">
           Сообщения
         </h1>
 
@@ -46,7 +46,7 @@ export function SupportWorkspacePage() {
                   <Send className="size-4 text-primary-foreground" aria-hidden="true" />
                 </span>
               </div>
-              <h2 className="text-xl font-bold tracking-tight">Начнём с переписки</h2>
+              <h2 className="text-lg font-medium">Начнём с переписки</h2>
               <p className="mt-3 max-w-72 text-center text-sm leading-relaxed text-muted-foreground">
                 Выберите клиента слева, чтобы посмотреть его сообщения и историю обращения.
               </p>

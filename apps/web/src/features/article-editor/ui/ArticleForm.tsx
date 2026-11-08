@@ -32,7 +32,7 @@ export function ArticleForm({ article, onSaved, onCancel }: ArticleFormProps) {
   return (
     <form noValidate onSubmit={handleSubmit} className="space-y-6" aria-busy={save.isPending}>
       <div className="space-y-2">
-        <label htmlFor="article-title" className="text-sm font-semibold">
+        <label htmlFor="article-title" className="text-sm font-medium">
           Заголовок
         </label>
         <Input
@@ -53,7 +53,7 @@ export function ArticleForm({ article, onSaved, onCancel }: ArticleFormProps) {
         )}
       </div>
       <div className="space-y-2">
-        <label htmlFor="article-content" className="text-sm font-semibold">
+        <label htmlFor="article-content" className="text-sm font-medium">
           Текст статьи
         </label>
         <textarea

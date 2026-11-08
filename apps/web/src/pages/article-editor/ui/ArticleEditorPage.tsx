@@ -30,7 +30,7 @@ export function ArticleEditorPage() {
     <div className="workspace-background min-h-dvh">
       <WorkspaceHeader />
       <main className="mx-auto max-w-4xl px-4 py-7 md:px-8 md:py-10">
-        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+        <h1 className="text-xl font-medium md:text-2xl">
           {selectedId === null ? 'Новая статья' : 'Редактирование статьи'}
         </h1>
         <p className="mt-2 mb-7 text-sm text-muted-foreground">

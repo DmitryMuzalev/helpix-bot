@@ -4,7 +4,7 @@ import { useAuth } from '@/entities/session';
 import { SignOutButton } from '@/features/sign-out';
 
 const navLinkClass =
-  'flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring sm:px-3 sm:text-sm';
+  'flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-normal text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring sm:px-3 sm:text-sm';
 
 export function WorkspaceHeader() {
   const { user } = useAuth();
@@ -17,7 +17,7 @@ export function WorkspaceHeader() {
           className="flex shrink-0 items-center gap-2.5 rounded-md focus-visible:outline-2 focus-visible:outline-ring"
         >
           <img src="/favicon.svg" alt="" className="size-8 shrink-0" aria-hidden="true" />
-          <span className="hidden text-xl font-extrabold tracking-[-0.06em] sm:block">
+          <span className="hidden text-xl font-medium sm:block">
             helpix<span className="text-primary">.</span>
           </span>
         </Link>

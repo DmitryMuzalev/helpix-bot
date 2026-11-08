@@ -20,7 +20,7 @@ export function LoginPage() {
       <div className="w-full max-w-md">
         <div className="mb-8 flex items-center justify-center gap-2.5">
           <img src="/favicon.svg" alt="" className="size-10" aria-hidden="true" />
-          <span className="text-3xl font-extrabold tracking-[-0.06em]">
+          <span className="text-3xl font-medium">
             helpix<span className="text-primary">.</span>
           </span>
         </div>
@@ -28,7 +28,7 @@ export function LoginPage() {
           className="rounded-2xl border bg-card/70 p-6 shadow-xl sm:p-8"
           aria-labelledby="login-title"
         >
-          <h1 id="login-title" className="text-2xl font-bold tracking-tight">
+          <h1 id="login-title" className="text-xl font-medium">
             Вход в Helpix
           </h1>
           <p className="mt-2 mb-7 text-sm text-muted-foreground">Панель технической поддержки</p>
