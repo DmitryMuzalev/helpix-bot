@@ -16,22 +16,19 @@ export function LoginPage() {
   if (user) return null;
 
   return (
-    <main className="workspace-background flex min-h-dvh items-center justify-center px-4 py-10">
+    <main className="workspace-background workspace-frame flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
-        <div className="mb-8 flex items-center justify-center gap-2.5">
+        <div className="mb-6 flex items-center justify-center gap-2.5">
           <img src="/favicon.svg" alt="" className="size-10" aria-hidden="true" />
           <span className="text-3xl font-medium">
             helpix<span className="text-primary">.</span>
           </span>
         </div>
-        <section
-          className="rounded-2xl border bg-card/70 p-6 shadow-xl sm:p-8"
-          aria-labelledby="login-title"
-        >
+        <section className="rounded-xl bg-card p-5 sm:p-6" aria-labelledby="login-title">
           <h1 id="login-title" className="text-xl font-medium">
             Вход в Helpix
           </h1>
-          <p className="mt-2 mb-7 text-sm text-muted-foreground">Панель технической поддержки</p>
+          <p className="mt-2 mb-6 text-sm text-muted-foreground">Панель технической поддержки</p>
           {isLoading ? (
             <div role="status" className="flex items-center gap-2 text-sm text-muted-foreground">
               <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
@@ -49,7 +46,7 @@ export function LoginPage() {
                 </p>
               )}
               <SignInForm />
-              <p className="mt-6 border-t pt-5 text-xs leading-5 text-muted-foreground">
+              <p className="mt-6 border-t border-border/60 pt-4 text-xs leading-5 text-muted-foreground">
                 Доступ предоставляется сотрудникам. Для получения аккаунта обратитесь к
                 администратору.
               </p>

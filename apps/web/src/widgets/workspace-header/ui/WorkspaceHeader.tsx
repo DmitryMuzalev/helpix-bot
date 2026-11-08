@@ -4,13 +4,13 @@ import { useAuth } from '@/entities/session';
 import { SignOutButton } from '@/features/sign-out';
 
 const navLinkClass =
-  'flex items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-normal text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring sm:px-3 sm:text-sm';
+  'flex h-8 items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-xs font-normal text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring';
 
 export function WorkspaceHeader() {
   const { user } = useAuth();
   return (
-    <header className="flex h-18 shrink-0 items-center justify-between gap-3 border-b px-4 md:px-8">
-      <div className="flex min-w-0 items-center gap-3 sm:gap-6">
+    <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border/60 px-3 sm:gap-4 sm:px-5 md:h-15 md:px-6">
+      <div className="flex min-w-0 items-center gap-2 sm:gap-6">
         <Link
           to="/clients"
           aria-label="Helpix — к списку клиентов"

@@ -18,19 +18,19 @@ export function ArticlePage() {
   const handleDeleted = () => void navigate({ to: '/articles', replace: true });
 
   return (
-    <div className="workspace-background min-h-dvh">
+    <div className="workspace-background workspace-frame">
       <WorkspaceHeader />
-      <main className="mx-auto max-w-5xl px-4 py-7 md:px-8 md:py-10">
+      <main className="mx-auto max-w-5xl px-4 py-6 md:px-6">
         <Link
           to="/articles"
-          className="mb-6 inline-flex items-center gap-2 rounded-md text-sm text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+          className="mb-4 inline-flex min-h-11 items-center gap-2 rounded-full text-xs text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring md:min-h-8"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />К статьям
         </Link>
         {article.isPending ? (
           <div role="status" aria-label="Загрузка статьи" className="space-y-5">
             <Skeleton className="h-9 w-3/4" />
-            <Skeleton className="h-64 rounded-2xl" />
+            <Skeleton className="h-64 rounded-xl" />
           </div>
         ) : article.isError ? (
           <StatePanel
@@ -39,8 +39,8 @@ export function ArticlePage() {
             onRetry={isNotFound ? undefined : handleRetry}
           />
         ) : (
-          <article className="rounded-2xl border bg-card/70 p-5 md:p-8">
-            <div className="flex flex-wrap items-start justify-between gap-5">
+          <article className="rounded-xl bg-card p-5 md:p-6">
+            <div className="flex flex-wrap items-start justify-between gap-4">
               <h1 className="w-full min-w-0 text-xl leading-snug font-medium [overflow-wrap:anywhere] sm:w-auto sm:flex-1 md:text-2xl">
                 {article.data.title}
               </h1>
@@ -62,7 +62,7 @@ export function ArticlePage() {
                 Обновлено <ArticleDate value={article.data.updated_at} />
               </span>
             </div>
-            <div className="mt-7 border-t pt-7 text-sm leading-7 whitespace-pre-wrap [overflow-wrap:anywhere] md:text-base md:leading-8">
+            <div className="mt-6 border-t border-border/60 pt-6 text-sm leading-7 whitespace-pre-wrap [overflow-wrap:anywhere] md:text-base md:leading-8">
               {article.data.content}
             </div>
           </article>

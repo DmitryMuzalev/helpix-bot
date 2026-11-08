@@ -26,16 +26,16 @@ export function MessageTimeline({ query }: { query: TimelineQuery }) {
         tabIndex={0}
         role="region"
         aria-label="Переписка"
-        className="chat-scroll quiet-scroll conversation-background h-full overflow-y-auto px-4 pb-5 focus-visible:outline-2 focus-visible:outline-ring/50 md:px-8 xl:px-14"
+        className="chat-scroll quiet-scroll conversation-background h-full overflow-y-auto px-3 pb-4 focus-visible:outline-2 focus-visible:outline-ring/50 md:px-6 xl:px-8"
       >
         <div className="flex min-h-full flex-col">
           <div ref={sentinelRef} className="h-px" aria-hidden="true" />
-          <div className="flex min-h-14 shrink-0 items-center justify-center py-3">
+          <div className="flex min-h-12 shrink-0 items-center justify-center py-2">
             {query.isFetchNextPageError ? (
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-destructive"
+                className="h-auto min-h-10 max-w-full text-wrap text-destructive md:min-h-8"
                 onClick={handleLoadOlder}
               >
                 Не удалось загрузить историю. Повторить
@@ -48,7 +48,7 @@ export function MessageTimeline({ query }: { query: TimelineQuery }) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 text-xs text-muted-foreground"
+                className="text-muted-foreground"
                 disabled={query.isFetching}
                 onClick={handleLoadOlder}
               >
@@ -59,14 +59,14 @@ export function MessageTimeline({ query }: { query: TimelineQuery }) {
             )}
           </div>
 
-          <div className="mx-auto mt-auto w-full max-w-[820px] space-y-3">
+          <div className="mx-auto mt-auto w-full max-w-[880px] space-y-2.5">
             {messages.map((message, index) => {
               const shouldShowDate =
                 index === 0 || dateKey(messages[index - 1].sent_at) !== dateKey(message.sent_at);
               return (
                 <Fragment key={message.id}>
                   {shouldShowDate && (
-                    <div className="flex justify-center py-4">
+                    <div className="flex justify-center py-3">
                       <span className="rounded-full border bg-background px-3 py-1 text-[10px] font-medium text-muted-foreground">
                         {dayLabel(message.sent_at)}
                       </span>
@@ -84,7 +84,7 @@ export function MessageTimeline({ query }: { query: TimelineQuery }) {
         <Button
           variant="outline"
           size="sm"
-          className="absolute right-5 bottom-5 rounded-full border-border bg-card shadow-lg hover:bg-accent"
+          className="absolute right-4 bottom-4 border-border bg-card hover:bg-accent"
           onClick={handleScrollToLatest}
         >
           <ArrowDown className="size-3.5" /> К последним сообщениям

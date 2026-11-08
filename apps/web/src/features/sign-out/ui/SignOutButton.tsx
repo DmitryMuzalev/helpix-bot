@@ -15,6 +15,7 @@ export function SignOutButton() {
       <Button
         variant="ghost"
         size="sm"
+        className="max-sm:size-8 max-sm:p-0"
         aria-label="Выйти"
         disabled={logout.isPending}
         onClick={handleSignOut}
@@ -29,7 +30,7 @@ export function SignOutButton() {
       {logout.isError && (
         <p
           role="alert"
-          className="absolute top-full right-0 z-50 mt-2 w-72 rounded-xl border border-destructive/30 bg-card p-4 text-sm text-destructive shadow-xl"
+          className="absolute top-full right-0 z-50 mt-2 w-72 rounded-xl border border-destructive/30 bg-card p-4 text-sm text-destructive"
         >
           {getAuthErrorMessage(logout.error, 'Не удалось выйти. Попробуйте снова.')}
         </p>

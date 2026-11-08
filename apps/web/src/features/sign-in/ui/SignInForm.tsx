@@ -31,7 +31,7 @@ export function SignInForm() {
   return (
     <form noValidate onSubmit={handleSubmit} className="space-y-5" aria-busy={login.isPending}>
       <div className="space-y-2">
-        <label htmlFor="login-email" className="text-sm font-medium">
+        <label htmlFor="login-email" className="block text-xs text-muted-foreground">
           Email
         </label>
         <Input
@@ -48,7 +48,6 @@ export function SignInForm() {
           disabled={login.isPending}
           aria-invalid={Boolean(errors.email)}
           aria-describedby={errors.email ? 'login-email-error' : undefined}
-          className="h-11"
         />
         {errors.email && (
           <p id="login-email-error" role="alert" className="text-sm text-destructive">
@@ -57,7 +56,7 @@ export function SignInForm() {
         )}
       </div>
       <div className="space-y-2">
-        <label htmlFor="login-password" className="text-sm font-medium">
+        <label htmlFor="login-password" className="block text-xs text-muted-foreground">
           Пароль
         </label>
         <Input
@@ -71,7 +70,6 @@ export function SignInForm() {
           disabled={login.isPending}
           aria-invalid={Boolean(errors.password)}
           aria-describedby={errors.password ? 'login-password-error' : undefined}
-          className="h-11"
         />
         {errors.password && (
           <p id="login-password-error" role="alert" className="text-sm text-destructive">
@@ -82,12 +80,12 @@ export function SignInForm() {
       {login.isError && (
         <p
           role="alert"
-          className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive"
+          className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive"
         >
           {getAuthErrorMessage(login.error, 'Не удалось войти. Попробуйте снова.')}
         </p>
       )}
-      <Button type="submit" disabled={login.isPending} className="h-11 w-full">
+      <Button type="submit" disabled={login.isPending} className="h-10 w-full">
         {login.isPending ? (
           <LoaderCircle className="animate-spin" aria-hidden="true" />
         ) : (

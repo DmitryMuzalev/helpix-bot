@@ -30,9 +30,9 @@ export function ArticleForm({ article, onSaved, onCancel }: ArticleFormProps) {
   }
 
   return (
-    <form noValidate onSubmit={handleSubmit} className="space-y-6" aria-busy={save.isPending}>
+    <form noValidate onSubmit={handleSubmit} className="space-y-5" aria-busy={save.isPending}>
       <div className="space-y-2">
-        <label htmlFor="article-title" className="text-sm font-medium">
+        <label htmlFor="article-title" className="block text-xs text-muted-foreground">
           Заголовок
         </label>
         <Input
@@ -44,7 +44,6 @@ export function ArticleForm({ article, onSaved, onCancel }: ArticleFormProps) {
           disabled={save.isPending}
           aria-invalid={Boolean(errors.title)}
           aria-describedby={errors.title ? 'article-title-error' : undefined}
-          className="h-11"
         />
         {errors.title && (
           <p id="article-title-error" role="alert" className="text-sm text-destructive">
@@ -53,7 +52,7 @@ export function ArticleForm({ article, onSaved, onCancel }: ArticleFormProps) {
         )}
       </div>
       <div className="space-y-2">
-        <label htmlFor="article-content" className="text-sm font-medium">
+        <label htmlFor="article-content" className="block text-xs text-muted-foreground">
           Текст статьи
         </label>
         <textarea
@@ -61,12 +60,12 @@ export function ArticleForm({ article, onSaved, onCancel }: ArticleFormProps) {
           value={content}
           onChange={(event) => setContent(event.target.value)}
           placeholder="Опишите решение по шагам…"
-          rows={12}
+          rows={10}
           required
           disabled={save.isPending}
           aria-invalid={Boolean(errors.content)}
           aria-describedby={errors.content ? 'article-content-error' : 'article-content-hint'}
-          className="quiet-scroll min-h-64 w-full resize-y rounded-xl border bg-muted p-4 text-sm leading-7 outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:opacity-50 aria-invalid:border-destructive"
+          className="quiet-scroll min-h-56 w-full resize-y rounded-md border border-input bg-muted p-3 text-base leading-6 outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:opacity-50 aria-invalid:border-destructive md:text-sm"
         />
         <p id="article-content-hint" className="text-xs text-muted-foreground">
           Обычный текст. Переносы строк и отступы сохраняются.
@@ -80,12 +79,12 @@ export function ArticleForm({ article, onSaved, onCancel }: ArticleFormProps) {
       {save.isError && (
         <p
           role="alert"
-          className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive"
+          className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive"
         >
           {save.error.message}
         </p>
       )}
-      <div className="flex flex-wrap items-center gap-3 border-t pt-5">
+      <div className="flex flex-wrap items-center gap-2 border-t border-border/60 pt-4">
         <Button type="submit" disabled={save.isPending}>
           {save.isPending ? (
             <LoaderCircle className="animate-spin" aria-hidden="true" />

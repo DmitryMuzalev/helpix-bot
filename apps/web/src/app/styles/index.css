@@ -80,8 +80,12 @@
   background: var(--background);
 }
 
+.workspace-frame {
+  min-height: 100dvh;
+}
+
 .conversation-background {
-  background: var(--background);
+  background: var(--card);
 }
 
 .chat-scroll {
@@ -100,6 +104,19 @@
 .quiet-scroll::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 10px;
+}
+
+@media (width >= 48rem) {
+  .workspace-frame {
+    min-height: calc(100dvh - 1.5rem);
+    margin: 0.75rem;
+    border: 4px solid var(--border);
+    border-radius: calc(var(--radius) + 16px);
+  }
+
+  .support-workspace {
+    height: calc(100dvh - 1.5rem);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

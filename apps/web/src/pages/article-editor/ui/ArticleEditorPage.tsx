@@ -27,18 +27,18 @@ export function ArticleEditorPage() {
       : navigate({ to: '/articles/$articleId', params: { articleId: String(selectedId) } }));
 
   return (
-    <div className="workspace-background min-h-dvh">
+    <div className="workspace-background workspace-frame">
       <WorkspaceHeader />
-      <main className="mx-auto max-w-4xl px-4 py-7 md:px-8 md:py-10">
+      <main className="mx-auto max-w-5xl px-4 py-6 md:px-6">
         <h1 className="text-xl font-medium md:text-2xl">
           {selectedId === null ? 'Новая статья' : 'Редактирование статьи'}
         </h1>
-        <p className="mt-2 mb-7 text-sm text-muted-foreground">
+        <p className="mt-2 mb-6 text-sm text-muted-foreground">
           Заполните заголовок и текст инструкции.
         </p>
         {selectedId !== null && article.isPending ? (
           <div role="status" aria-label="Загрузка статьи" className="space-y-5">
-            <Skeleton className="h-11" />
+            <Skeleton className="h-11 md:h-9" />
             <Skeleton className="h-64 rounded-xl" />
           </div>
         ) : selectedId !== null && article.isError && !article.data ? (
@@ -53,7 +53,7 @@ export function ArticleEditorPage() {
             </Button>
           </>
         ) : (
-          <div className="rounded-2xl border bg-card/70 p-5 md:p-8">
+          <div className="rounded-xl bg-card p-5 md:p-6">
             {selectedId !== null && article.isError && (
               <p role="status" className="mb-5 text-sm text-destructive">
                 Не удалось обновить статью. Введённый текст сохранён в форме.

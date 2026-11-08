@@ -22,16 +22,16 @@ export function ClientsSidebar({ selectedId }: { selectedId: number | null }) {
     <aside
       aria-label="Клиенты"
       className={cn(
-        'flex min-h-0 w-full shrink-0 flex-col border-r bg-card md:w-[320px] xl:w-[352px]',
+        'flex min-h-0 w-full shrink-0 flex-col overflow-hidden bg-card md:w-72 md:rounded-xl xl:w-76',
         selectedId !== null && 'hidden md:flex',
       )}
     >
-      <div className="px-5 pt-6 pb-4">
-        <div className="mb-5 flex items-center justify-between">
+      <div className="px-4 pt-4 pb-3">
+        <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <h2 className="text-base font-medium">Клиенты</h2>
             {clients.data && (
-              <Badge variant="outline" className="rounded-md px-1.5 text-muted-foreground">
+              <Badge variant="outline" className="px-1.5 text-[10px] text-muted-foreground">
                 {clients.data.length}
               </Badge>
             )}
@@ -46,7 +46,7 @@ export function ClientsSidebar({ selectedId }: { selectedId: number | null }) {
           <div aria-label="Загрузка клиентов" className="space-y-2 p-2">
             {Array.from({ length: 6 }, (_, index) => (
               <div key={index} className="flex items-center gap-3 p-2">
-                <Skeleton className="size-11 rounded-2xl" />
+                <Skeleton className="size-9 rounded-lg" />
                 <div className="flex-1 space-y-2">
                   <Skeleton className="h-3 w-3/4" />
                   <Skeleton className="h-3 w-1/2" />
@@ -73,7 +73,7 @@ export function ClientsSidebar({ selectedId }: { selectedId: number | null }) {
             }
           />
         ) : (
-          <nav aria-label="Список клиентов" className="space-y-1">
+          <nav aria-label="Список клиентов" className="space-y-0.5">
             {filtered.map((client) => {
               const isActive = client.id === selectedId;
               return (
@@ -83,14 +83,14 @@ export function ClientsSidebar({ selectedId }: { selectedId: number | null }) {
                   params={{ clientId: String(client.id) }}
                   aria-current={isActive ? 'page' : undefined}
                   className={cn(
-                    'group relative flex items-center gap-3 rounded-xl border border-transparent px-3 py-3.5 transition-colors focus-visible:outline-2 focus-visible:outline-ring',
+                    'group relative flex min-h-16 items-center gap-3 rounded-lg border border-transparent px-2.5 py-2.5 transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring md:min-h-14',
                     isActive
                       ? 'border-primary/50 bg-primary/15'
                       : 'hover:border-border hover:bg-muted/70',
                   )}
                 >
                   {isActive && (
-                    <span className="absolute inset-y-5 left-0 w-0.5 rounded-full bg-highlight" />
+                    <span className="absolute inset-y-4 left-0 w-0.5 rounded-full bg-highlight" />
                   )}
                   <ClientAvatar client={client} />
                   <div className="min-w-0 flex-1">
@@ -106,7 +106,7 @@ export function ClientsSidebar({ selectedId }: { selectedId: number | null }) {
                         {activityTime(client.last_message_at)}
                       </time>
                     </div>
-                    <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                    <div className="mt-1 flex items-center gap-1.5 text-[11px] text-muted-foreground">
                       <MessageSquare className="size-3 shrink-0" aria-hidden="true" />
                       <span className="truncate">
                         {client.username ? `@${client.username}` : 'Переписка в Telegram'}

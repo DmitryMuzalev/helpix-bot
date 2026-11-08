@@ -47,7 +47,7 @@ export function DeleteArticleButton({ article, onDeleted }: DeleteArticleButtonP
       <AlertDialog.Portal>
         <AlertDialog.Overlay className="fixed inset-0 z-50 bg-black/65" />
         <AlertDialog.Content
-          className="fixed top-1/2 left-1/2 z-50 max-h-[85dvh] w-[calc(100%_-_2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border bg-card p-6 shadow-2xl"
+          className="fixed top-1/2 left-1/2 z-50 max-h-[85dvh] w-[calc(100%_-_2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border bg-card p-5 sm:p-6"
           onEscapeKeyDown={(event) => {
             if (deletion.isPending) event.preventDefault();
           }}
@@ -61,7 +61,7 @@ export function DeleteArticleButton({ article, onDeleted }: DeleteArticleButtonP
               {deletion.error.message}
             </p>
           )}
-          <div className="mt-6 flex flex-wrap justify-end gap-3">
+          <div className="mt-5 flex flex-wrap justify-end gap-2">
             <AlertDialog.Cancel asChild>
               <Button variant="outline" disabled={deletion.isPending}>
                 Отмена

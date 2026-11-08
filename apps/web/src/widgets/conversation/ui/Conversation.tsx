@@ -16,15 +16,18 @@ export function Conversation({ clientId }: { clientId: number }) {
   const handleRetryMessages = () => void messages.refetch();
 
   return (
-    <section aria-label="Диалог с клиентом" className="flex min-h-0 min-w-0 flex-1 flex-col">
-      <header className="flex min-h-21 shrink-0 items-center gap-3 border-b bg-background/80 px-4 md:px-7">
+    <section
+      aria-label="Диалог с клиентом"
+      className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-card md:rounded-xl"
+    >
+      <header className="flex min-h-16 shrink-0 items-center gap-3 border-b border-border/60 px-4 md:min-h-15 md:px-5">
         <div className="flex min-w-0 items-center gap-3">
           <Button asChild variant="ghost" size="icon" className="-ml-1 shrink-0 md:hidden">
             <Link to="/clients" aria-label="Назад к клиентам">
               <ArrowLeft className="size-5" />
             </Link>
           </Button>
-          {client ? <ClientAvatar client={client} /> : <Skeleton className="size-11 rounded-2xl" />}
+          {client ? <ClientAvatar client={client} /> : <Skeleton className="size-9 rounded-lg" />}
           <div className="min-w-0">
             <h2 className="truncate text-sm font-medium md:text-base">
               {client
@@ -47,10 +50,10 @@ export function Conversation({ clientId }: { clientId: number }) {
           description="Выберите другую переписку в списке клиентов."
         />
       ) : messages.isPending ? (
-        <div aria-label="Загрузка переписки" className="flex flex-1 flex-col justify-end gap-6 p-7">
-          <Skeleton className="h-24 w-2/3 rounded-2xl" />
-          <Skeleton className="ml-auto h-20 w-1/2 rounded-2xl" />
-          <Skeleton className="h-16 w-3/5 rounded-2xl" />
+        <div aria-label="Загрузка переписки" className="flex flex-1 flex-col justify-end gap-3 p-5">
+          <Skeleton className="h-20 w-2/3 rounded-xl" />
+          <Skeleton className="ml-auto h-16 w-1/2 rounded-xl" />
+          <Skeleton className="h-16 w-3/5 rounded-xl" />
         </div>
       ) : messages.isError && !messages.data ? (
         <StatePanel

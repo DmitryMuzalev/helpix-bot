@@ -14,19 +14,22 @@ export function SearchClientsInput({ value, onChange }: SearchClientsInputProps)
 
   return (
     <div className="relative">
-      <Search className="absolute top-3 left-3 size-4 text-muted-foreground" aria-hidden="true" />
+      <Search
+        className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+        aria-hidden="true"
+      />
       <Input
         aria-label="Поиск клиентов"
         placeholder="Найти клиента…"
         value={value}
         onChange={handleChange}
-        className="h-10 rounded-xl pr-9 pl-9 text-sm shadow-none"
+        className="pr-11 pl-9 md:pr-9"
       />
       {value && (
         <Button
           variant="ghost"
           size="icon"
-          className="absolute top-1 right-1 size-8"
+          className="absolute top-1/2 right-1 size-9 -translate-y-1/2 md:size-7"
           aria-label="Очистить поиск"
           onClick={handleClear}
         >

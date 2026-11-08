@@ -13,7 +13,7 @@ export function MessageBubble({ message }: { message: SupportMessage }) {
     >
       <div
         className={cn(
-          'max-w-[88%] rounded-2xl border px-4 py-3 text-[13px] leading-[1.7] shadow-sm md:max-w-[75%]',
+          'max-w-[92%] rounded-xl border px-3.5 py-2.5 text-[13px] leading-relaxed md:max-w-[78%]',
           isBot
             ? 'rounded-br-md border-primary/40 bg-primary/15'
             : 'rounded-bl-md border-border bg-muted',
