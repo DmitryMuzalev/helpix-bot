@@ -84,7 +84,7 @@ export function MessageTimeline({ query }: { query: TimelineQuery }) {
         <Button
           variant="outline"
           size="sm"
-          className="absolute right-5 bottom-5 rounded-full border-[#566747] bg-card shadow-lg hover:bg-accent"
+          className="absolute right-5 bottom-5 rounded-full border-border bg-card shadow-lg hover:bg-accent"
           onClick={handleScrollToLatest}
         >
           <ArrowDown className="size-3.5" /> К последним сообщениям

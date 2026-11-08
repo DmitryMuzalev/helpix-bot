@@ -20,7 +20,7 @@ export function SearchClientsInput({ value, onChange }: SearchClientsInputProps)
         placeholder="Найти клиента…"
         value={value}
         onChange={handleChange}
-        className="h-10 rounded-xl bg-background/60 pr-9 pl-9 text-sm shadow-none"
+        className="h-10 rounded-xl pr-9 pl-9 text-sm shadow-none"
       />
       {value && (
         <Button

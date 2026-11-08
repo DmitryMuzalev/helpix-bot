@@ -25,7 +25,7 @@ export function SupportWorkspacePage() {
           Сообщения
         </h1>
 
-        <div className="flex min-h-0 flex-1 overflow-hidden border-border md:rounded-2xl md:border md:shadow-[0_20px_80px_#00000020]">
+        <div className="flex min-h-0 flex-1 overflow-hidden border-border md:rounded-2xl md:border">
           <ClientsSidebar selectedId={selectedId} />
           {selectedId !== null ? (
             <Conversation key={selectedId} clientId={selectedId} />
@@ -35,16 +35,15 @@ export function SupportWorkspacePage() {
               aria-label="Выбор переписки"
             >
               <div className="relative mb-7">
-                <div className="absolute -inset-6 rounded-full bg-primary/5 blur-2xl" />
-                <div className="relative flex size-24 items-center justify-center rounded-[28px] border border-secondary/20 bg-[#2d3826]">
+                <div className="relative flex size-24 items-center justify-center rounded-[28px] border bg-muted">
                   <MessageSquare
-                    className="size-10 text-secondary"
+                    className="size-10 text-foreground"
                     strokeWidth={1.5}
                     aria-hidden="true"
                   />
                 </div>
-                <span className="absolute -right-2 -bottom-2 flex size-9 items-center justify-center rounded-xl border border-[#4c6340] bg-[#35472b]">
-                  <Send className="size-4 text-primary" aria-hidden="true" />
+                <span className="absolute -right-2 -bottom-2 flex size-9 items-center justify-center rounded-xl border border-primary bg-primary">
+                  <Send className="size-4 text-primary-foreground" aria-hidden="true" />
                 </span>
               </div>
               <h2 className="text-xl font-bold tracking-tight">Начнём с переписки</h2>

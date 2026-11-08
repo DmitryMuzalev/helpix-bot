@@ -25,7 +25,7 @@ export function WorkspaceHeader() {
           <Link
             to="/clients"
             className={navLinkClass}
-            activeProps={{ className: 'bg-accent text-foreground' }}
+            activeProps={{ className: 'bg-primary text-primary-foreground' }}
           >
             <MessageSquare className="hidden size-4 sm:block" aria-hidden="true" />
             Сообщения
@@ -33,7 +33,7 @@ export function WorkspaceHeader() {
           <Link
             to="/articles"
             className={navLinkClass}
-            activeProps={{ className: 'bg-accent text-foreground' }}
+            activeProps={{ className: 'bg-primary text-primary-foreground' }}
           >
             <BookOpen className="hidden size-4 sm:block" aria-hidden="true" />
             База знаний

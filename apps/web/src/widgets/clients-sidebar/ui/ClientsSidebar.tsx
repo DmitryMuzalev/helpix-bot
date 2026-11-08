@@ -22,7 +22,7 @@ export function ClientsSidebar({ selectedId }: { selectedId: number | null }) {
     <aside
       aria-label="Клиенты"
       className={cn(
-        'flex min-h-0 w-full shrink-0 flex-col border-r bg-[#252822] md:w-[320px] xl:w-[352px]',
+        'flex min-h-0 w-full shrink-0 flex-col border-r bg-card md:w-[320px] xl:w-[352px]',
         selectedId !== null && 'hidden md:flex',
       )}
     >
@@ -85,12 +85,12 @@ export function ClientsSidebar({ selectedId }: { selectedId: number | null }) {
                   className={cn(
                     'group relative flex items-center gap-3 rounded-xl border border-transparent px-3 py-3.5 transition-colors focus-visible:outline-2 focus-visible:outline-ring',
                     isActive
-                      ? 'border-[#546943]/60 bg-[#35422d]'
+                      ? 'border-primary/50 bg-primary/15'
                       : 'hover:border-border hover:bg-muted/70',
                   )}
                 >
                   {isActive && (
-                    <span className="absolute inset-y-5 left-0 w-0.5 rounded-full bg-secondary" />
+                    <span className="absolute inset-y-5 left-0 w-0.5 rounded-full bg-highlight" />
                   )}
                   <ClientAvatar client={client} />
                   <div className="min-w-0 flex-1">
@@ -102,7 +102,7 @@ export function ClientsSidebar({ selectedId }: { selectedId: number | null }) {
                         dateTime={client.last_message_at ?? undefined}
                         className={cn(
                           'shrink-0 text-[10px]',
-                          isActive ? 'text-secondary' : 'text-muted-foreground',
+                          isActive ? 'text-highlight' : 'text-muted-foreground',
                         )}
                       >
                         {activityTime(client.last_message_at)}

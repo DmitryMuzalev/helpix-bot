@@ -66,7 +66,7 @@ export function ArticleForm({ article, onSaved, onCancel }: ArticleFormProps) {
           disabled={save.isPending}
           aria-invalid={Boolean(errors.content)}
           aria-describedby={errors.content ? 'article-content-error' : 'article-content-hint'}
-          className="quiet-scroll min-h-64 w-full resize-y rounded-xl border bg-background/40 p-4 text-sm leading-7 outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:opacity-50 aria-invalid:border-destructive"
+          className="quiet-scroll min-h-64 w-full resize-y rounded-xl border bg-muted p-4 text-sm leading-7 outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:opacity-50 aria-invalid:border-destructive"
         />
         <p id="article-content-hint" className="text-xs text-muted-foreground">
           Обычный текст. Переносы строк и отступы сохраняются.

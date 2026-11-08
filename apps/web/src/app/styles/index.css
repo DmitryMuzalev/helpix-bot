@@ -13,6 +13,7 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-highlight: var(--highlight);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -32,24 +33,25 @@
 :root {
   color-scheme: dark;
   --radius: 0.75rem;
-  --background: #20221f;
-  --foreground: #f0f2eb;
-  --card: #262923;
-  --card-foreground: #f0f2eb;
-  --popover: #2b2e28;
-  --popover-foreground: #f0f2eb;
-  --primary: #56ff6a;
-  --primary-foreground: #122315;
-  --secondary: #a8ff64;
-  --secondary-foreground: #192510;
-  --muted: #2c3029;
-  --muted-foreground: #a2a89b;
-  --accent: #343c2e;
-  --accent-foreground: #dfffd0;
+  --background: #0d0d0d;
+  --foreground: #f2f2f2;
+  --card: #141414;
+  --card-foreground: #f2f2f2;
+  --popover: #1f1f1f;
+  --popover-foreground: #f2f2f2;
+  --primary: #25479d;
+  --primary-foreground: #f2f2f2;
+  --highlight: #a8baff;
+  --secondary: #1f1f1f;
+  --secondary-foreground: #f2f2f2;
+  --muted: #1f1f1f;
+  --muted-foreground: #a0a0a0;
+  --accent: #282828;
+  --accent-foreground: #f2f2f2;
   --destructive: #ff9292;
-  --border: #383c34;
-  --input: #383c34;
-  --ring: #56ff6a;
+  --border: #2b2b2b;
+  --input: #333333;
+  --ring: #8ca5ed;
 }
 
 @layer base {
@@ -68,18 +70,17 @@
     cursor: pointer;
   }
   ::selection {
-    background: #56ff6a;
-    color: #122315;
+    background: var(--primary);
+    color: var(--primary-foreground);
   }
 }
 
 .workspace-background {
-  background: radial-gradient(ellipse at 15% 0%, #a8ff640a, transparent 45%), var(--background);
+  background: var(--background);
 }
 
 .conversation-background {
-  background-image: radial-gradient(#ffffff05 1px, transparent 1px);
-  background-size: 22px 22px;
+  background: var(--background);
 }
 
 .chat-scroll {
@@ -88,7 +89,7 @@
 
 .quiet-scroll {
   scrollbar-width: thin;
-  scrollbar-color: #444b3c transparent;
+  scrollbar-color: var(--border) transparent;
 }
 
 .quiet-scroll::-webkit-scrollbar {
@@ -96,7 +97,7 @@
 }
 
 .quiet-scroll::-webkit-scrollbar-thumb {
-  background: #444b3c;
+  background: var(--border);
   border-radius: 10px;
 }
 

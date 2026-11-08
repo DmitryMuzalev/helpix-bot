@@ -56,9 +56,9 @@ export function ArticlesPage() {
                 key={article.id}
                 to="/articles/$articleId"
                 params={{ articleId: String(article.id) }}
-                className="group flex items-center gap-4 rounded-xl border bg-card/70 p-5 transition-colors hover:border-secondary/40 hover:bg-accent/50 focus-visible:outline-2 focus-visible:outline-ring"
+                className="group flex items-center gap-4 rounded-xl border bg-card/70 p-5 transition-colors hover:border-primary/60 hover:bg-accent/50 focus-visible:outline-2 focus-visible:outline-ring"
               >
-                <span className="hidden size-11 shrink-0 items-center justify-center rounded-xl border bg-muted text-secondary sm:flex">
+                <span className="hidden size-11 shrink-0 items-center justify-center rounded-xl border bg-muted text-highlight sm:flex">
                   <BookOpen className="size-5" aria-hidden="true" />
                 </span>
                 <div className="min-w-0 flex-1">
@@ -68,7 +68,7 @@ export function ArticlesPage() {
                   </p>
                 </div>
                 <ArrowUpRight
-                  className="size-4 shrink-0 text-muted-foreground group-hover:text-secondary"
+                  className="size-4 shrink-0 text-muted-foreground group-hover:text-highlight"
                   aria-hidden="true"
                 />
               </Link>
