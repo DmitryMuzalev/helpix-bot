@@ -1,6 +1,9 @@
+export type ArticleStatus = 'draft' | 'published';
+
 export interface ArticleSummary {
   id: number;
   title: string;
+  status: ArticleStatus;
   created_at: string;
   updated_at: string;
 }
@@ -12,6 +15,10 @@ export interface Article extends ArticleSummary {
 export interface ArticleInput {
   title: string;
   content: string;
+}
+
+export interface ArticleDraftInput extends ArticleInput {
+  status: 'draft';
 }
 
 export class InvalidArticleInput extends Error {}
@@ -44,4 +51,21 @@ export function validateArticleInput(value: unknown): ArticleInput {
   }
   // Trim the heading, but preserve indentation and line breaks in the article body.
   return { title: value.title.trim(), content: value.content };
+}
+
+export function validateArticleStatusInput(value: unknown): ArticleStatus {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    throw new InvalidArticleInput('Body must be an object with status');
+  }
+  if (Object.keys(value).some((key) => key !== 'status')) {
+    throw new InvalidArticleInput('Only status may be provided');
+  }
+  if (!('status' in value) || (value.status !== 'draft' && value.status !== 'published')) {
+    throw new InvalidArticleInput('status must be draft or published');
+  }
+  return value.status;
+}
+
+export function hasArticleContentChanged(article: Article, input: ArticleInput): boolean {
+  return article.title !== input.title || article.content !== input.content;
 }

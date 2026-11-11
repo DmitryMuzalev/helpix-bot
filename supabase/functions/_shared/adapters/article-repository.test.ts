@@ -24,7 +24,7 @@ Deno.test(
       if (!url.searchParams.has('id')) {
         hasLoadedPage = true;
         assert(
-          url.searchParams.get('select') === 'id,title,created_at,updated_at',
+          url.searchParams.get('select') === 'id,title,status,created_at,updated_at',
           'Loaded content',
         );
         assert(url.searchParams.get('order') === 'created_at.desc,id.desc', 'Unstable ordering');
@@ -34,18 +34,22 @@ Deno.test(
       }
       assert(url.searchParams.get('id') === 'eq.42', 'Incorrect article filter');
       assert(url.searchParams.get('select')?.includes('content'), 'Content was omitted');
-      return Response.json([{ id: 42, title: 'Heading', content: 'Body' }]);
+      assert(url.searchParams.get('select')?.includes('status'), 'Status was omitted');
+      return Response.json([{ id: 42, title: 'Heading', content: 'Body', status: 'draft' }]);
     });
     await repository.loadPage(500, 999);
     const article = await repository.findById(42);
-    assert(hasLoadedPage && article?.content === 'Body', 'Article was not loaded');
+    assert(
+      hasLoadedPage && article?.content === 'Body' && article.status === 'draft',
+      'Article was not loaded',
+    );
   },
 );
 
 Deno.test(
   'inserts and updates only editable fields and filters update and delete by ID',
   async () => {
-    const input = { title: 'Heading', content: 'Body' };
+    const input = { title: 'Heading', content: 'Body', status: 'draft' as const };
     const methods: string[] = [];
     const repository = createRepository(async (request, init) => {
       const url = new URL(String(request));
@@ -72,12 +76,37 @@ Deno.test(
   },
 );
 
+Deno.test('changes only the publication status of the selected article', async () => {
+  const statuses: string[] = [];
+  const repository = createRepository(async (request, init) => {
+    const url = new URL(String(request));
+    assert(url.pathname === '/rest/v1/articles' && init?.method === 'PATCH', 'Unexpected mutation');
+    assert(url.searchParams.get('id') === 'eq.42', 'Status change may affect other articles');
+    assert(url.searchParams.get('select')?.includes('status'), 'Status was omitted');
+    const body = JSON.parse(String(init.body));
+    assert(Object.keys(body).join(',') === 'status', 'Status change may overwrite article content');
+    statuses.push(body.status);
+    return Response.json({ id: 42, title: 'Heading', content: 'Body', status: body.status });
+  });
+
+  assert(
+    (await repository.setStatus(42, 'published'))?.status === 'published',
+    'Publication failed',
+  );
+  assert((await repository.setStatus(42, 'draft'))?.status === 'draft', 'Unpublication failed');
+  assert(statuses.join(',') === 'published,draft', 'Unexpected publication statuses');
+});
+
 Deno.test('treats zero affected rows as missing articles', async () => {
   const repository = createRepository(async () => Response.json([]));
   assert((await repository.findById(42)) === null, 'Missing read returned an article');
   assert(
-    (await repository.update(42, { title: 'Heading', content: 'Body' })) === null,
+    (await repository.update(42, { title: 'Heading', content: 'Body', status: 'draft' })) === null,
     'Missing update returned an article',
+  );
+  assert(
+    (await repository.setStatus(42, 'published')) === null,
+    'Missing status change returned an article',
   );
   assert(!(await repository.remove(42)), 'Missing delete reported success');
 });
@@ -91,12 +120,15 @@ Deno.test('returns 500 for database failures without exposing database details',
     ['GET', '?id=42'],
     ['POST', ''],
     ['PUT', '?id=42'],
+    ['PATCH', '?id=42'],
     ['DELETE', '?id=42'],
   ]) {
-    const hasBody = method === 'POST' || method === 'PUT';
+    const hasBody = method === 'POST' || method === 'PUT' || method === 'PATCH';
+    const body =
+      method === 'PATCH' ? { status: 'published' } : { title: 'Heading', content: 'Body' };
     const req = new Request(`https://example.supabase.co/functions/v1/articles${query}`, {
       method,
-      ...(hasBody ? { body: JSON.stringify({ title: 'Heading', content: 'Body' }) } : {}),
+      ...(hasBody ? { body: JSON.stringify(body) } : {}),
     });
     const response = await handleArticlesRequest(req, repository);
     assert(response.status === 500, `${method} swallowed a database failure`);

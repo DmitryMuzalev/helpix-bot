@@ -2,8 +2,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { ArticleRepository } from '../application/articles.ts';
 import type { Article, ArticleSummary } from '../domain/article.ts';
 
-const ARTICLE_SUMMARY_COLUMNS = 'id, title, created_at, updated_at';
-const ARTICLE_COLUMNS = 'id, title, content, created_at, updated_at';
+const ARTICLE_SUMMARY_COLUMNS = 'id, title, status, created_at, updated_at';
+const ARTICLE_COLUMNS = 'id, title, content, status, created_at, updated_at';
 
 export function createArticleRepository(db: SupabaseClient): ArticleRepository {
   return {
@@ -43,6 +43,17 @@ export function createArticleRepository(db: SupabaseClient): ArticleRepository {
       const { data, error } = await db
         .from('articles')
         .update(input)
+        .eq('id', id)
+        .select(ARTICLE_COLUMNS)
+        .maybeSingle<Article>();
+      if (error) throw error;
+      return data;
+    },
+
+    async setStatus(id, status) {
+      const { data, error } = await db
+        .from('articles')
+        .update({ status })
         .eq('id', id)
         .select(ARTICLE_COLUMNS)
         .maybeSingle<Article>();

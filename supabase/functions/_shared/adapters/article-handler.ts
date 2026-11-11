@@ -1,4 +1,5 @@
 import {
+  changeArticleStatus,
   createArticle,
   deleteArticle,
   getArticle,
@@ -8,7 +9,7 @@ import {
 } from '../application/articles.ts';
 import { ArticleNotFound, InvalidArticleInput } from '../domain/article.ts';
 
-const ALLOWED_METHODS = 'GET, POST, PUT, DELETE';
+const ALLOWED_METHODS = 'GET, POST, PUT, PATCH, DELETE';
 
 async function readJson(req: Request): Promise<unknown> {
   try {
@@ -48,6 +49,8 @@ export async function handleArticlesRequest(
         return Response.json(await createArticle(await readJson(req), repository), { status: 201 });
       case 'PUT':
         return Response.json(await updateArticle(id, await readJson(req), repository));
+      case 'PATCH':
+        return Response.json(await changeArticleStatus(id, await readJson(req), repository));
       default:
         await deleteArticle(id, repository);
         return new Response(null, { status: 204 });

@@ -46,6 +46,7 @@ const protectedEndpoints = [
   { path: 'articles?id=1', method: 'GET', handler: articlesFunction, status: 200 },
   { path: 'articles', method: 'POST', handler: articlesFunction, status: 201 },
   { path: 'articles?id=1', method: 'PUT', handler: articlesFunction, status: 200 },
+  { path: 'articles?id=1', method: 'PATCH', handler: articlesFunction, status: 200 },
   { path: 'articles?id=1', method: 'DELETE', handler: articlesFunction, status: 204 },
 ];
 
@@ -89,6 +90,7 @@ Deno.test('operator APIs require a verified user session before accessing data',
           id: 1,
           title: 'Help',
           content: 'Instructions',
+          status: 'draft',
           created_at: '2026-10-20T12:00:00Z',
           updated_at: '2026-10-20T12:00:00Z',
         };
@@ -162,7 +164,11 @@ Deno.test('operator APIs require a verified user session before accessing data',
     await test.step('accepts valid user JWTs for reads and article mutations', async () => {
       for (const { path, method, handler, status } of protectedEndpoints) {
         databaseRequests.length = 0;
-        const hasBody = method === 'POST' || method === 'PUT';
+        const hasBody = method === 'POST' || method === 'PUT' || method === 'PATCH';
+        const body =
+          method === 'PATCH'
+            ? { status: 'published' }
+            : { title: 'Updated heading', content: 'Updated instructions' };
         const response = await handler.fetch(
           new Request(`https://example.supabase.co/functions/v1/${path}`, {
             method,
@@ -170,13 +176,15 @@ Deno.test('operator APIs require a verified user session before accessing data',
               Authorization: `Bearer ${userToken}`,
               'Content-Type': 'application/json',
             },
-            ...(hasBody
-              ? { body: JSON.stringify({ title: 'Help', content: 'Instructions' }) }
-              : {}),
+            ...(hasBody ? { body: JSON.stringify(body) } : {}),
           }),
         );
         assert(response.status === status, `${method} ${path} rejected a valid user`);
-        assert(databaseRequests.length === 1, 'Authenticated request did not reach storage');
+        const expectedRequests = method === 'PUT' ? 2 : 1;
+        assert(
+          databaseRequests.length === expectedRequests,
+          'Unexpected authenticated storage access',
+        );
         await response.body?.cancel();
       }
     });
