@@ -15,7 +15,7 @@ export interface SupportDialogAnalysis {
   // Only facts explicitly supported by the client's messages; no invented contact details.
   // Omit unchanged fields. Use null to clear a corrected fact, not to mean "not mentioned".
   update: SupportDialogUpdate;
-  // A single intake question, used only when the domain asks to clarify the assistance type.
+  // A single intake question, used only while the problem is being diagnosed.
   // Never technical troubleshooting or a claim that an engineer has received a request.
   clarificationQuestion: string | null;
 }

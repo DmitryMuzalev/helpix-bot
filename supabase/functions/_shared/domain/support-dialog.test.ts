@@ -1,10 +1,13 @@
 import {
-  completeSupportDialog,
+  cancelSupportCase,
   createSupportDialogState,
+  editSupportCaseContacts,
   getNextSupportDialogAction,
   markInstallationGuideOffered,
-  type SupportDialogAction,
-  type SupportDialogUpdate,
+  recordSolutionResult,
+  recordSolutionSearch,
+  submitSupportCase,
+  type SupportDialogState,
   updateSupportDialog,
 } from './support-dialog.ts';
 
@@ -23,196 +26,167 @@ function assertThrows(action: () => unknown): void {
   throw new Error('Expected the operation to be rejected');
 }
 
-const REMOTE_FACTS: SupportDialogUpdate = {
-  assistanceType: 'remote',
-  problemDescription: 'Не печатает принтер',
-  hasInternet: true,
-  remoteAccessStatus: 'available',
-};
+function createCheckingRemoteState(): SupportDialogState {
+  const described = updateSupportDialog(createSupportDialogState(), {
+    problemDescription: 'Не печатает принтер',
+  });
+  return recordSolutionSearch(described, false);
+}
 
-const ONSITE_FACTS: SupportDialogUpdate = {
-  assistanceType: 'onsite',
-  problemDescription: 'Компьютер не включается',
-  fullName: 'Иванов Иван Иванович',
-  address: 'Москва, ул. Примерная, д. 1',
-  phone: '+7 999 123-45-67',
-};
-
-const ACTION_CASES: {
-  name: string;
-  update: SupportDialogUpdate;
-  expected: SupportDialogAction;
-}[] = [
-  {
-    name: 'asks for the problem before collecting route-specific details',
-    update: { assistanceType: 'onsite' },
-    expected: { type: 'ask_problem' },
-  },
-  {
-    name: 'keeps insufficient information separate from onsite assistance',
-    update: { problemDescription: 'Не работает' },
-    expected: { type: 'clarify_assistance_type', reason: 'unknown' },
-  },
-  {
-    name: 'groups unknown remote prerequisites into one action',
-    update: { assistanceType: 'remote', problemDescription: 'Не печатает принтер' },
-    expected: { type: 'ask_remote_setup', missing: ['hasInternet', 'remoteAccessStatus'] },
-  },
-  {
-    name: 'does not ask again about known internet availability',
-    update: { ...REMOTE_FACTS, remoteAccessStatus: 'unknown' },
-    expected: { type: 'ask_remote_setup', missing: ['remoteAccessStatus'] },
-  },
-  {
-    name: 'does not ask again about available remote software',
-    update: { ...REMOTE_FACTS, hasInternet: null },
-    expected: { type: 'ask_remote_setup', missing: ['hasInternet'] },
-  },
-  {
-    name: 'does not assume internet availability when software is missing',
-    update: { ...REMOTE_FACTS, hasInternet: null, remoteAccessStatus: 'missing' },
-    expected: { type: 'ask_remote_setup', missing: ['hasInternet'] },
-  },
-  {
-    name: 'offers installation instead of automatically choosing onsite assistance',
-    update: { ...REMOTE_FACTS, remoteAccessStatus: 'missing' },
-    expected: { type: 'offer_installation_guide' },
-  },
-  {
-    name: 'clarifies the route when internet is unavailable',
-    update: { ...REMOTE_FACTS, hasInternet: false },
-    expected: { type: 'clarify_assistance_type', reason: 'remote_unavailable' },
-  },
-  {
-    name: 'clarifies the route when installation is declined',
-    update: { ...REMOTE_FACTS, remoteAccessStatus: 'declined' },
-    expected: { type: 'clarify_assistance_type', reason: 'remote_unavailable' },
-  },
-  {
-    name: 'clarifies the route when remote access cannot be prepared',
-    update: { ...REMOTE_FACTS, remoteAccessStatus: 'unavailable' },
-    expected: { type: 'clarify_assistance_type', reason: 'remote_unavailable' },
-  },
-  {
-    name: 'completes remote intake without requiring onsite contacts or a software name',
-    update: REMOTE_FACTS,
-    expected: { type: 'complete' },
-  },
-  {
-    name: 'groups only the missing onsite contacts',
-    update: {
-      assistanceType: 'onsite',
-      problemDescription: 'Не включается',
-      fullName: 'Иванов Иван',
-    },
-    expected: { type: 'ask_onsite_details', missing: ['address', 'phone'] },
-  },
-  {
-    name: 'does not accept whitespace as collected contact information',
-    update: { ...ONSITE_FACTS, phone: '   ' },
-    expected: { type: 'ask_onsite_details', missing: ['phone'] },
-  },
-  {
-    name: 'completes onsite intake without asking remote prerequisites',
-    update: ONSITE_FACTS,
-    expected: { type: 'complete' },
-  },
-];
-
-for (const { name, update, expected } of ACTION_CASES) {
-  Deno.test(name, () => {
-    const state = updateSupportDialog(createSupportDialogState(), update);
-    assertEquals(getNextSupportDialogAction(state), expected);
+function createRemoteContactState(): SupportDialogState {
+  return updateSupportDialog(createCheckingRemoteState(), {
+    canDeviceStart: true,
+    hasInternet: true,
+    hasRemoteConsent: true,
+    remoteAccessStatus: 'available',
   });
 }
 
-Deno.test(
-  'preserves existing facts, applies corrections and does not mutate the previous state',
-  () => {
-    const original = updateSupportDialog(createSupportDialogState(), ONSITE_FACTS);
-    const updated = updateSupportDialog(original, { address: '  Другой адрес  ', phone: null });
-    assertEquals(updated.facts.address, 'Другой адрес');
-    assertEquals(updated.facts.phone, null);
-    assertEquals(updated.facts.fullName, original.facts.fullName);
-    assertEquals(original.facts.address, ONSITE_FACTS.address);
-    assertEquals(original.facts.phone, ONSITE_FACTS.phone);
-  },
-);
+function createOnsiteContactState(): SupportDialogState {
+  return updateSupportDialog(createCheckingRemoteState(), { canDeviceStart: false });
+}
 
-Deno.test('preserves a negative internet answer instead of treating it as missing', () => {
-  const state = updateSupportDialog(createSupportDialogState(), { hasInternet: false });
-  assertEquals(
-    updateSupportDialog(state, { problemDescription: 'Принтер' }).facts.hasInternet,
-    false,
-  );
+Deno.test('asks for a problem before searching for a solution', () => {
+  const state = createSupportDialogState();
+  assertEquals(getNextSupportDialogAction(state), { type: 'ask_problem' });
+  assertThrows(() => recordSolutionSearch(state, true));
+
+  const described = updateSupportDialog(state, { problemDescription: '  Не включается  ' });
+  assertEquals(described.facts.problemDescription, 'Не включается');
+  assertEquals(getNextSupportDialogAction(described), { type: 'find_solution' });
 });
 
-Deno.test('waits for installation results without offering the same guide again', () => {
-  const state = updateSupportDialog(createSupportDialogState(), {
-    ...REMOTE_FACTS,
+Deno.test('waits for the user to report whether the proposed solution worked', () => {
+  const described = updateSupportDialog(createSupportDialogState(), {
+    problemDescription: 'Не работает принтер',
+  });
+  const waiting = recordSolutionSearch(described, true);
+  assertEquals(waiting.status, 'waiting_solution_result');
+  assertEquals(getNextSupportDialogAction(waiting), { type: 'ask_solution_result' });
+  assertEquals(recordSolutionResult(waiting, true).status, 'resolved');
+  assertEquals(recordSolutionResult(waiting, false).status, 'checking_remote');
+});
+
+Deno.test('goes directly to remote readiness when no solution was found', () => {
+  const state = createCheckingRemoteState();
+  assertEquals(state.status, 'checking_remote');
+  assertEquals(getNextSupportDialogAction(state), {
+    type: 'ask_remote_setup',
+    missing: ['canDeviceStart', 'hasInternet', 'hasRemoteConsent', 'remoteAccessStatus'],
+  });
+});
+
+Deno.test('selects remote help when every remote prerequisite is satisfied', () => {
+  const state = createRemoteContactState();
+  assertEquals(state.status, 'collecting_contacts');
+  assertEquals(state.facts.assistanceType, 'remote');
+  assertEquals(getNextSupportDialogAction(state), {
+    type: 'ask_contact_details',
+    assistanceType: 'remote',
+    missing: ['fullName', 'phone', 'preferredTime'],
+  });
+});
+
+for (const [name, update] of [
+  ['the device cannot start', { canDeviceStart: false }],
+  ['internet is unavailable', { hasInternet: false }],
+  ['the user declines remote access', { hasRemoteConsent: false }],
+  ['remote software is declined', { remoteAccessStatus: 'declined' as const }],
+  ['remote software cannot be prepared', { remoteAccessStatus: 'unavailable' as const }],
+] as const) {
+  Deno.test(`selects onsite help when ${name}`, () => {
+    const state = updateSupportDialog(createCheckingRemoteState(), update);
+    assertEquals(state.status, 'collecting_contacts');
+    assertEquals(state.facts.assistanceType, 'onsite');
+    assertEquals(getNextSupportDialogAction(state), {
+      type: 'ask_contact_details',
+      assistanceType: 'onsite',
+      missing: ['fullName', 'phone', 'address', 'preferredTime'],
+    });
+  });
+}
+
+Deno.test('offers an installation guide once and waits for its result', () => {
+  const state = updateSupportDialog(createCheckingRemoteState(), {
+    canDeviceStart: true,
+    hasInternet: true,
+    hasRemoteConsent: true,
     remoteAccessStatus: 'missing',
   });
+  assertEquals(getNextSupportDialogAction(state), { type: 'offer_installation_guide' });
+
   const offered = markInstallationGuideOffered(state);
-  assertEquals(state.hasOfferedInstallationGuide, false);
   assertEquals(getNextSupportDialogAction(offered), { type: 'ask_installation_result' });
-  assertThrows(() => completeSupportDialog(offered));
+  assertThrows(() => markInstallationGuideOffered(offered));
 
   const installed = updateSupportDialog(offered, { remoteAccessStatus: 'available' });
-  assertEquals(getNextSupportDialogAction(installed), { type: 'complete' });
+  assertEquals(installed.status, 'collecting_contacts');
+  assertEquals(installed.facts.assistanceType, 'remote');
+
+  const failed = updateSupportDialog(offered, { remoteAccessStatus: 'unavailable' });
+  assertEquals(failed.status, 'collecting_contacts');
+  assertEquals(failed.facts.assistanceType, 'onsite');
 });
 
-Deno.test('does not mark a guide as offered when remote setup is unknown', () => {
-  assertThrows(() => markInstallationGuideOffered(createSupportDialogState()));
-});
+Deno.test('reuses remote contacts and requires an address only for onsite help', () => {
+  const remote = updateSupportDialog(createRemoteContactState(), {
+    fullName: '  Иван Иванов  ',
+    phone: '  +79991234567  ',
+    preferredTime: '  После 18:00  ',
+  });
+  assertEquals(remote.status, 'awaiting_confirmation');
+  assertEquals(remote.facts.fullName, 'Иван Иванов');
+  assertEquals(getNextSupportDialogAction(remote), { type: 'confirm_submission' });
 
-Deno.test(
-  'switches to onsite intake without losing the problem or already collected contacts',
-  () => {
-    const remote = updateSupportDialog(createSupportDialogState(), {
-      ...REMOTE_FACTS,
-      hasInternet: false,
-      phone: '+7 999 123-45-67',
-    });
-    const onsite = updateSupportDialog(remote, { assistanceType: 'onsite' });
-    assertEquals(onsite.facts.problemDescription, REMOTE_FACTS.problemDescription);
-    assertEquals(getNextSupportDialogAction(onsite), {
-      type: 'ask_onsite_details',
-      missing: ['fullName', 'address'],
-    });
-  },
-);
-
-Deno.test('rejects premature completion of unknown, remote and onsite intake', () => {
-  for (const update of [
-    {},
-    { ...REMOTE_FACTS, hasInternet: null },
-    { ...ONSITE_FACTS, address: null },
-  ]) {
-    assertThrows(() =>
-      completeSupportDialog(updateSupportDialog(createSupportDialogState(), update)),
-    );
-  }
-});
-
-Deno.test('completed intake stays terminal and does not restart on another update', () => {
-  const state = updateSupportDialog(createSupportDialogState(), ONSITE_FACTS);
-  const completed = completeSupportDialog(state);
-  assertEquals(state.status, 'collecting');
-  assertEquals(completed.status, 'completed');
-  assertEquals(getNextSupportDialogAction(completed), { type: 'none' });
-  assertEquals(updateSupportDialog(completed, REMOTE_FACTS), completed);
-  assertEquals(completeSupportDialog(completed), completed);
-});
-
-Deno.test('a new dialog has fresh facts and a separate installation guide flag', () => {
-  const previous = completeSupportDialog(
-    updateSupportDialog(createSupportDialogState(), ONSITE_FACTS),
+  const onsite = updateSupportDialog(createOnsiteContactState(), {
+    fullName: remote.facts.fullName,
+    phone: remote.facts.phone,
+    preferredTime: remote.facts.preferredTime,
+  });
+  assertEquals(onsite.status, 'collecting_contacts');
+  assertEquals(getNextSupportDialogAction(onsite), {
+    type: 'ask_contact_details',
+    assistanceType: 'onsite',
+    missing: ['address'],
+  });
+  assertEquals(
+    updateSupportDialog(onsite, { address: 'Москва, ул. Примерная, д. 1' }).status,
+    'awaiting_confirmation',
   );
-  const next = createSupportDialogState();
-  assertEquals(next.status, 'collecting');
-  assertEquals(next.facts.problemDescription, null);
-  assertEquals(next.facts.fullName, null);
-  assertEquals(next.facts.phone, null);
-  assertEquals(next.hasOfferedInstallationGuide, false);
-  assertEquals(previous.status, 'completed');
+});
+
+Deno.test('allows contact editing before submission and submits only a confirmed case', () => {
+  const ready = updateSupportDialog(createRemoteContactState(), {
+    fullName: 'Иван Иванов',
+    phone: '+79991234567',
+    preferredTime: 'После 18:00',
+  });
+  assertThrows(() => submitSupportCase(createRemoteContactState()));
+
+  const editing = editSupportCaseContacts(ready);
+  assertEquals(editing.status, 'collecting_contacts');
+  const changed = updateSupportDialog(editing, { phone: '+79997654321' });
+  assertEquals(changed.status, 'awaiting_confirmation');
+  assertEquals(submitSupportCase(changed).status, 'submitted');
+});
+
+Deno.test('cancelled, resolved and submitted cases are terminal', () => {
+  const described = updateSupportDialog(createSupportDialogState(), {
+    problemDescription: 'Не работает',
+  });
+  const resolved = recordSolutionResult(recordSolutionSearch(described, true), true);
+  const cancelled = cancelSupportCase(described);
+  const submitted = submitSupportCase(
+    updateSupportDialog(createRemoteContactState(), {
+      fullName: 'Иван Иванов',
+      phone: '+79991234567',
+      preferredTime: 'После 18:00',
+    }),
+  );
+
+  for (const state of [resolved, cancelled, submitted]) {
+    assertEquals(getNextSupportDialogAction(state), { type: 'none' });
+    assertEquals(updateSupportDialog(state, { phone: '+70000000000' }), state);
+    assertEquals(cancelSupportCase(state), state);
+  }
 });
